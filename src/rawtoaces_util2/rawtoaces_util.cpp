@@ -787,15 +787,29 @@ void ImageConverter::applyMatrix(
 
 bool ImageConverter::process()
 {
+
+    
     if ( _IDT_matrix.size() )
     {
+        std::cout
+            << "Apply IDT matrix"
+            << std::endl;
+        
         applyMatrix( _IDT_matrix );
     }
 
     if ( _CAT_matrix.size() )
     {
+        std::cout
+            << "Apply CAT matrix"
+            << std::endl;
+        
         applyMatrix( _CAT_matrix );
 
+        std::cout
+            << "Apply ACES matrix"
+            << std::endl;
+        
         _imageBuffer = OIIO::ImageBufAlgo::colormatrixtransform(
             _imageBuffer, XYZ_acesrgb_transposed_4 );
     }
@@ -829,6 +843,10 @@ void ImageConverter::prepareIDT_spectral(
 {
     std::string lower_illuminant( illuminant );
 
+    std::cout
+        << "Load lower illuminant"
+        << std::endl;
+    
     if ( lower_illuminant.length() == 0 )
         lower_illuminant = "na";
     else
@@ -839,6 +857,10 @@ void ImageConverter::prepareIDT_spectral(
             lower_illuminant.begin(),
             []( unsigned char c ) { return std::tolower( c ); } );
     }
+    
+    std::cout
+        << "Illuminant data used: " << lower_illuminant
+        << std::endl;
 
     Idt idt;
 
@@ -848,11 +870,19 @@ void ImageConverter::prepareIDT_spectral(
     bool found_camera = false;
     auto camera_paths = collectDataFiles( "camera" );
 
+    std::cout
+        << "Load spectral sensitivity data for camera: " << _cameraMake << " " << _cameraModel
+        << std::endl;
+    
     for ( auto &path: camera_paths )
     {
         if ( idt.loadCameraSpst(
                  path, _cameraMake.c_str(), _cameraModel.c_str() ) )
         {
+            std::cout
+                << "Camera data used: " << _cameraMake << " " << _cameraModel
+                << std::endl;
+            
             found_camera = true;
             break;
         }
@@ -863,10 +893,18 @@ void ImageConverter::prepareIDT_spectral(
     {
         idt.loadTrainingData( training );
     }
+    
+    std::cout
+        << "Load CMF data"
+        << std::endl;
 
     auto cmf = findFile( "cmf/cmf_1931.json" );
     if ( cmf.length() )
     {
+        std::cout
+            << "CMF data used: " << lower_illuminant
+            << std::endl;
+        
         idt.loadCMF( cmf );
     }
 

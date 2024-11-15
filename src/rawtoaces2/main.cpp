@@ -10,6 +10,10 @@ using namespace rta;
 
 int main( int argc, const char *argv[] )
 {
+    std::cout << "rawtoaces2" << std::endl;
+    
+    std::cout << std::endl;
+    
     ImageConverter converter;
 
     if ( !converter.parse( argc, argv ) )
@@ -17,6 +21,14 @@ int main( int argc, const char *argv[] )
         return 1;
     }
 
+    std::cout << "Parse arguments" << std::endl
+              << "-----------------------------------"
+              << std::endl;
+    for (int i = 0; i < argc; ++i) {
+        std::cout << argv[i]
+                  << std::endl;
+    }
+    
     auto                    &argParse = converter.argParse();
     auto                     files = argParse["filename"].as_vec<std::string>();
     std::vector<std::string> files_to_convert;
@@ -68,7 +80,13 @@ int main( int argc, const char *argv[] )
             output_filename = input_filename.substr( 0, pos );
         }
         output_filename += "_oiio.exr";
+        
+        std::cout << std::endl;
 
+        std::cout << "Configure conversion" << std::endl
+                  << "-----------------------------------"
+                  << std::endl;
+        
         if ( !converter.configure( input_filename ) )
         {
             std::cerr << "Failed to configure the reader for the file: "
@@ -76,7 +94,13 @@ int main( int argc, const char *argv[] )
             result = false;
             continue;
         }
+        
+        std::cout << std::endl;
 
+        std::cout << "Load file: " << input_filename  << std::endl
+                  << "-----------------------------------"
+                  << std::endl;
+        
         if ( !converter.load( input_filename ) )
         {
             std::cerr << "Failed to read for the file: " << input_filename
@@ -84,7 +108,13 @@ int main( int argc, const char *argv[] )
             result = false;
             continue;
         }
+        
+        std::cout << std::endl;
 
+        std::cout << "Process conversion" << std::endl
+                  << "-----------------------------------"
+                  << std::endl;
+        
         if ( !converter.process() )
         {
             std::cerr << "Failed to convert the file: " << input_filename
@@ -92,7 +122,12 @@ int main( int argc, const char *argv[] )
             result = false;
             continue;
         }
+        
+        std::cout << std::endl;
 
+        std::cout << "Save to file: " << output_filename << std::endl
+                  << "-----------------------------------"
+                  << std::endl;
         if ( !converter.save( output_filename ) )
         {
             std::cerr << "Failed to save the file: " << output_filename
@@ -100,7 +135,8 @@ int main( int argc, const char *argv[] )
             result = false;
             continue;
         }
+        
+        std::cout << "Conversion successful" << std::endl;
     }
-
     return result ? 0 : 1;
 }
