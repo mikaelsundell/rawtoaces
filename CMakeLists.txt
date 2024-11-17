@@ -9,7 +9,7 @@ set( RAWTOACES_VERSION ${RAWTOACES_MAJOR_VERSION}.${RAWTOACES_MINOR_VERSION}.${R
 set(RAWTOACESIDTLIB "rawtoaces_idt")
 set(RAWTOACESLIB "rawtoaces_util")
 
-set( CMAKE_MACOSX_RPATH 1 )
+set( CMAKE_MACOSX_RPATH 0 )
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     add_compile_options ( /W0 )

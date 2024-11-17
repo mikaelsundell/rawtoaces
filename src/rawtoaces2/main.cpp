@@ -22,8 +22,8 @@ int main( int argc, const char *argv[] )
     }
 
     std::cout << "Parse arguments" << std::endl
-              << "-----------------------------------"
-              << std::endl;
+              << "-----------------------------------" << std::endl;
+
     for (int i = 0; i < argc; ++i) {
         std::cout << argv[i]
                   << std::endl;
@@ -84,8 +84,7 @@ int main( int argc, const char *argv[] )
         std::cout << std::endl;
 
         std::cout << "Configure conversion" << std::endl
-                  << "-----------------------------------"
-                  << std::endl;
+                  << "-----------------------------------" << std::endl;
         
         if ( !converter.configure( input_filename ) )
         {
@@ -98,8 +97,8 @@ int main( int argc, const char *argv[] )
         std::cout << std::endl;
 
         std::cout << "Load file: " << input_filename  << std::endl
-                  << "-----------------------------------"
-                  << std::endl;
+                  << "-----------------------------------" << std::endl;
+
         
         if ( !converter.load( input_filename ) )
         {
@@ -126,8 +125,8 @@ int main( int argc, const char *argv[] )
         std::cout << std::endl;
 
         std::cout << "Save to file: " << output_filename << std::endl
-                  << "-----------------------------------"
-                  << std::endl;
+                  << "-----------------------------------" << std::endl;
+
         if ( !converter.save( output_filename ) )
         {
             std::cerr << "Failed to save the file: " << output_filename
