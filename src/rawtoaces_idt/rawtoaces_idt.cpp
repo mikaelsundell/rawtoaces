@@ -11,7 +11,7 @@
 using namespace boost::property_tree;
 using namespace ceres;
 
-namespace rta
+namespace rawtoaces
 {
 Illum::Illum()
 {
@@ -1820,4 +1820,4 @@ template <typename T> bool Objfun::operator()( const T *B, T *residuals ) const
     return true;
 }
 
-} // namespace rta
+} // namespace rawtoaces

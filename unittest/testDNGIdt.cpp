@@ -10,7 +10,7 @@
 #include <rawtoaces/rawtoaces_idt.h>
 
 using namespace std;
-using namespace rta;
+using namespace rawtoaces;
 
 BOOST_AUTO_TEST_CASE( TestIDT_CcttoMired )
 {

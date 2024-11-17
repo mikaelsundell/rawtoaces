@@ -13,39 +13,29 @@
 
 #include <filesystem>
 
-namespace rta
+namespace rawtoaces
 {
 
-std::string findFile( const std::string &filename )
+std::string findFile( const std::string &filename, const std::string& datapath )
 {
-    auto paths = pathsFinder();
-
-    for ( auto &path: paths.paths )
-    {
-        std::string full_path = path + "/" + filename;
-        if ( std::filesystem::exists( full_path ) )
-            return full_path;
-    }
+    std::string full_path = datapath + "/" + filename;
+    if ( std::filesystem::exists( full_path ) )
+        return full_path;
     return "";
 }
 
-std::vector<std::string> collectDataFiles( const std::string &type )
+std::vector<std::string> collectDataFiles( const std::string &type, const std::string& datapath )
 {
     std::vector<std::string> result;
-
-    auto paths = pathsFinder();
-
-    for ( auto &path: paths.paths )
+    
+    auto it = std::filesystem::directory_iterator( datapath + "/" + type );
+    
+    for ( auto filename2: it )
     {
-        auto it = std::filesystem::directory_iterator( path + "/" + type );
-
-        for ( auto filename2: it )
+        auto p = filename2.path();
+        if ( filename2.path().extension() == ".json" )
         {
-            auto p = filename2.path();
-            if ( filename2.path().extension() == ".json" )
-            {
-                result.push_back( filename2.path().string() );
-            }
+            result.push_back( filename2.path().string() );
         }
     }
     return result;
@@ -107,9 +97,9 @@ const char *UsageString =
     "    rawtoaces --wb-method METHOD --mat-method METHOD [PARAMS] "
     "path/to/dir/or/file ...\n"
     "Examples: \n"
-    "    rawtoaces --wb-method metadata --mat-method metadata raw_file.cr3\n"
+    "    rawtoaces --wb-method metadata --mat-method metadata --input-filename raw_file.cr3 --output-filename raw-file.exr\n"
     "    rawtoaces --wb-method illuminant --illuminant 3200K --mat-method "
-    "spectral raw_file.cr3\n";
+    "spectral --input-filename raw_file.cr3 --output-filename raw-file.exr\n";
 
 void ImageConverter::initArgParse()
 {
@@ -118,8 +108,24 @@ void ImageConverter::initArgParse()
     _argParse.add_help( true );
     _argParse.add_version( "VERSION NUMBER" );
 
-    _argParse.arg( "filename" ).action( OIIO::ArgParse::append() ).hidden();
-
+    _argParse.arg( "--input-filename" )
+        .help(
+            "Input filename of raw image file." )
+        .metavar( "STR" )
+        .action( OIIO::ArgParse::store() );
+    
+    _argParse.arg( "--output-filename" )
+        .help(
+            "Output filename of Aces EXR file." )
+        .metavar( "STR" )
+        .action( OIIO::ArgParse::store() );
+    
+    _argParse.arg( "--data-path" )
+        .help(
+            "AMPAS data path for camera, cmf, illuminant and training data." )
+        .metavar( "STR" )
+        .action( OIIO::ArgParse::store() );
+    
     _argParse.arg( "--wb-method" )
         .help(
             "White balance method. Supported options: metadata, illuminant, "
@@ -332,18 +338,29 @@ bool ImageConverter::parse( int argc, const char *argv[] )
 {
     if ( _argParse.parse_args( argc, argv ) )
     {
-        // report error?
         return false;
     }
+    
+    if (_argParse["input-filename"].get().size() == 0) {
+        std::cerr << "--input-filename is required.\n";
+        return 1;
+    }
 
-    if ( _argParse["list-cameras"].get<int>() )
+    if (_argParse["output-filename"].get().size() == 0) {
+        std::cerr << "--output-filename is required.\n";
+        return 1;
+    }
+    
+    datapath = _argParse["data-path"].get();
+
+    if (_argParse["list-cameras"].get<int>() )
     {
         std::cout
             << "Spectral sensitivity data are available for the following cameras:"
             << std::endl;
 
         Idt                      idt;
-        auto                     paths = collectDataFiles( "camera" );
+        auto                     paths = collectDataFiles( "camera", datapath );
         std::vector<std::string> cameras;
         for ( auto path: paths )
         {
@@ -371,7 +388,7 @@ bool ImageConverter::parse( int argc, const char *argv[] )
         std::cout << "- Black-body radiation (e.g., 3200K)" << std::endl;
 
         Idt                      idt;
-        auto                     paths = collectDataFiles( "illuminant" );
+        auto                     paths = collectDataFiles( "illuminant", datapath );
         std::vector<std::string> illuminants;
         for ( auto path: paths )
         {
@@ -853,11 +870,11 @@ void ImageConverter::prepareIDT_spectral(
 
     Idt idt;
 
-    auto illum_paths = collectDataFiles( "illuminant" );
+    auto illum_paths = collectDataFiles( "illuminant", datapath );
     int  res         = idt.loadIlluminant( illum_paths, lower_illuminant );
 
     bool found_camera = false;
-    auto camera_paths = collectDataFiles( "camera" );
+    auto camera_paths = collectDataFiles( "camera", datapath );
 
     std::cout << "Load spectral sensitivity data for camera: " << _cameraMake
               << " " << _cameraModel << std::endl;
@@ -875,7 +892,7 @@ void ImageConverter::prepareIDT_spectral(
         }
     }
 
-    auto training = findFile( "training/training_spectral.json" );
+    auto training = findFile( "training/training_spectral.json", datapath );
     if ( training.length() )
     {
         idt.loadTrainingData( training );
@@ -883,7 +900,7 @@ void ImageConverter::prepareIDT_spectral(
     
     std::cout << "Load CMF data" << std::endl;
 
-    auto cmf = findFile( "cmf/cmf_1931.json" );
+    auto cmf = findFile( "cmf/cmf_1931.json", datapath );
     if ( cmf.length() )
     {
         std::cout << "CMF data used: " << lower_illuminant << std::endl;
@@ -976,4 +993,4 @@ void ImageConverter::prepareIDT_nonDNG()
     _CAT_matrix = getCAT( dIV, dOV );
 }
 
-} // namespace rta
+} // namespace rawtoaces

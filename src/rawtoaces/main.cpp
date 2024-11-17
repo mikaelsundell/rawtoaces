@@ -6,7 +6,7 @@
 
 #include <filesystem>
 
-using namespace rta;
+using namespace rawtoaces;
 
 int main( int argc, const char *argv[] )
 {
@@ -15,126 +15,60 @@ int main( int argc, const char *argv[] )
     std::cout << std::endl;
     
     ImageConverter converter;
-
     if ( !converter.parse( argc, argv ) )
     {
         return 1;
     }
-
-    std::cout << "Parse arguments" << std::endl
+    
+    auto &argParse = converter.argParse();
+    auto inputfilename = argParse["input-filename"].as_string();
+    auto outputfilename = argParse["output-filename"].as_string();
+    std::cout << "Configure conversion" << std::endl
               << "-----------------------------------" << std::endl;
-
-    for (int i = 0; i < argc; ++i)
+    
+    if (!converter.configure(inputfilename))
     {
-        std::cout << argv[i] << std::endl;
+        std::cerr << "Failed to configure the converter for the file: "
+                  << inputfilename << std::endl;
+        return 1;
     }
     
-    auto                    &argParse = converter.argParse();
-    auto                     files = argParse["filename"].as_vec<std::string>();
-    std::vector<std::string> files_to_convert;
+    std::cout << std::endl;
 
-    for ( auto filename: files )
+    std::cout << "Load file: " << inputfilename << std::endl
+              << "-----------------------------------" << std::endl;
+
+    if (!converter.load(inputfilename))
     {
-        if ( !std::filesystem::exists( filename ) )
-        {
-            std::cerr << "File or directory not found: " << filename
-                      << std::endl;
-            return 1;
-        }
-
-        auto canonical_filename = std::filesystem::canonical( filename );
-
-        if ( std::filesystem::is_directory( filename ) )
-        {
-            auto it = std::filesystem::directory_iterator( filename );
-
-            for ( auto filename2: it )
-            {
-                if ( std::filesystem::is_regular_file( filename2 ) ||
-                     std::filesystem::is_symlink( filename2 ) )
-                {
-                    files_to_convert.push_back( filename2.path().string() );
-                }
-            }
-        }
-        else if (
-            std::filesystem::is_regular_file( filename ) ||
-            std::filesystem::is_symlink( filename ) )
-        {
-            files_to_convert.push_back( filename );
-        }
-        else
-        {
-            std::cerr << "Not a file or directory: " << filename << std::endl;
-            return 1;
-        }
+        std::cerr << "Failed to read for the file: " << inputfilename
+                  << std::endl;
+        return 1;
     }
+    
+    std::cout << std::endl;
 
-    bool result = true;
-    for ( auto const &input_filename: files_to_convert )
+    std::cout << "Process conversion" << std::endl
+              << "-----------------------------------" << std::endl;
+    
+    if (!converter.process())
     {
-        std::string output_filename = input_filename;
-        size_t      pos             = input_filename.rfind( '.' );
-        if ( pos != std::string::npos )
-        {
-            output_filename = input_filename.substr( 0, pos );
-        }
-        output_filename += "_oiio.exr";
-        
-        std::cout << std::endl;
-
-        std::cout << "Configure conversion" << std::endl
-                  << "-----------------------------------" << std::endl;
-        
-        if ( !converter.configure( input_filename ) )
-        {
-            std::cerr << "Failed to configure the reader for the file: "
-                      << input_filename << std::endl;
-            result = false;
-            continue;
-        }
-        
-        std::cout << std::endl;
-
-        std::cout << "Load file: " << input_filename << std::endl
-                  << "-----------------------------------" << std::endl;
-
-        
-        if ( !converter.load( input_filename ) )
-        {
-            std::cerr << "Failed to read for the file: " << input_filename
-                      << std::endl;
-            result = false;
-            continue;
-        }
-        
-        std::cout << std::endl;
-
-        std::cout << "Process conversion" << std::endl
-                  << "-----------------------------------" << std::endl;
-        
-        if ( !converter.process() )
-        {
-            std::cerr << "Failed to convert the file: " << input_filename
-                      << std::endl;
-            result = false;
-            continue;
-        }
-        
-        std::cout << std::endl;
-
-        std::cout << "Save to file: " << output_filename << std::endl
-                  << "-----------------------------------" << std::endl;
-
-        if ( !converter.save( output_filename ) )
-        {
-            std::cerr << "Failed to save the file: " << output_filename
-                      << std::endl;
-            result = false;
-            continue;
-        }
-        
-        std::cout << "Conversion successful" << std::endl;
+        std::cerr << "Failed to convert the file: " << inputfilename
+                  << std::endl;
+        return 1;
     }
-    return result ? 0 : 1;
+    
+    std::cout << std::endl;
+
+    std::cout << "Save to file: " << outputfilename << std::endl
+              << "-----------------------------------" << std::endl;
+
+    if (!converter.save(outputfilename))
+    {
+        std::cerr << "Failed to save the file: " << outputfilename
+                  << std::endl;
+        return 1;
+    }
+    
+    std::cout << "Conversion successful" << std::endl;
+    return 0;
 }

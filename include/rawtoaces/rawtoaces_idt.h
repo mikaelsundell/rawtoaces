@@ -13,7 +13,7 @@
 
 using namespace std;
 
-namespace rta
+namespace rawtoaces
 {
     struct CIEXYZ
     {
@@ -217,4 +217,4 @@ namespace rta
         const vector<vector<double>> _RGB;
         const vector<vector<double>> _outLAB;
     };
-} // namespace rta
+} // namespace rawtoaces
