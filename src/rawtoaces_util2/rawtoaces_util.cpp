@@ -871,7 +871,7 @@ void ImageConverter::prepareIDT_spectral(
                  path, _cameraMake.c_str(), _cameraModel.c_str() ) )
         {
             std::cout << "Camera data used: " << _cameraMake << " "
-+                     << _cameraModel << std::endl;
+                      << _cameraModel << std::endl;
             
             found_camera = true;
             break;
