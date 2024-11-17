@@ -798,14 +798,10 @@ bool ImageConverter::process()
 
     if ( _CAT_matrix.size() )
     {
-        std::cout
-            << "Apply CAT matrix"
-            << std::endl;
+        std::cout << "Apply CAT matrix" << std::endl;
         
         applyMatrix( _CAT_matrix );
 
-        std::cout << "Apply ACES matrix" << std::endl;
-        
         _imageBuffer = OIIO::ImageBufAlgo::colormatrixtransform(
             _imageBuffer, XYZ_acesrgb_transposed_4 );
     }

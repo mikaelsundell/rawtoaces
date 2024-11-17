@@ -9,8 +9,6 @@ set( RAWTOACES_VERSION ${RAWTOACES_MAJOR_VERSION}.${RAWTOACES_MINOR_VERSION}.${R
 set(RAWTOACESIDTLIB "rawtoaces_idt")
 set(RAWTOACESLIB "rawtoaces_util")
 
-set( CMAKE_MACOSX_RPATH 0 )
-
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     add_compile_options ( /W0 )
     add_compile_definitions( NOMINMAX )
@@ -99,6 +97,11 @@ if ( WIN32 AND NOT CYGWIN )
 install( FILES "${PROJECT_BINARY_DIR}/RAWTOACESLibraryDepends.cmake" DESTINATION
   "${INSTALL_CMAKE_DIR}" COMPONENT dev )
 endif( )
+
+if(APPLE)
+  set(CMAKE_MACOSX_RPATH 0)
+  set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+endif()
 
 if ( APPLE OR UNIX )
 	install (DIRECTORY data DESTINATION include/rawtoaces)
