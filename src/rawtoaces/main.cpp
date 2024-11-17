@@ -10,10 +10,6 @@ using namespace rawtoaces;
 
 int main( int argc, const char *argv[] )
 {
-    std::cout << "rawtoaces2" << std::endl;
-    
-    std::cout << std::endl;
-    
     ImageConverter converter;
     if ( !converter.parse( argc, argv ) )
     {
@@ -23,8 +19,7 @@ int main( int argc, const char *argv[] )
     auto &argParse = converter.argParse();
     auto inputfilename = argParse["input-filename"].as_string();
     auto outputfilename = argParse["output-filename"].as_string();
-    std::cout << "Configure conversion" << std::endl
-              << "-----------------------------------" << std::endl;
+    std::cout << "** Configure conversion" << std::endl
     
     if (!converter.configure(inputfilename))
     {
@@ -35,8 +30,7 @@ int main( int argc, const char *argv[] )
     
     std::cout << std::endl;
 
-    std::cout << "Load file: " << inputfilename << std::endl
-              << "-----------------------------------" << std::endl;
+    std::cout << "** Load file: " << inputfilename << std::endl
 
     if (!converter.load(inputfilename))
     {
@@ -47,8 +41,7 @@ int main( int argc, const char *argv[] )
     
     std::cout << std::endl;
 
-    std::cout << "Process conversion" << std::endl
-              << "-----------------------------------" << std::endl;
+    std::cout << "** Process conversion" << std::endl
     
     if (!converter.process())
     {
@@ -59,8 +52,7 @@ int main( int argc, const char *argv[] )
     
     std::cout << std::endl;
 
-    std::cout << "Save to file: " << outputfilename << std::endl
-              << "-----------------------------------" << std::endl;
+    std::cout << "** Save to file: " << outputfilename << std::endl;
 
     if (!converter.save(outputfilename))
     {
@@ -69,6 +61,6 @@ int main( int argc, const char *argv[] )
         return 1;
     }
     
-    std::cout << "Conversion successful" << std::endl;
+    std::cout << "** Conversion successful" << std::endl;
     return 0;
 }
