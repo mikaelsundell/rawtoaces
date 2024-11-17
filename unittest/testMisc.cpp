@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE( Test_OpenDir )
 
 BOOST_AUTO_TEST_CASE( Test_LowerCase )
 {
-    char text[]      = "RAWTOACES";
+    char text[]      = "Rawtoaces";
     char text_test[] = "rawtoaces";
 
     lowerCase( text );

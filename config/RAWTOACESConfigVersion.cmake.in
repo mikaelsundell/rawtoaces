@@ -1,5 +1,5 @@
 
-set(PACKAGE_VERSION "@RAWTOACES_VERSION@")
+set(PACKAGE_VERSION "@Rawtoaces_VERSION@")
 
 #make sure we are compatible
 if( "${PACKAGE_VERSION}" VERSION_LESS "${PACKAGE_FIND_VERSION}" )

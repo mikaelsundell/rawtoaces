@@ -41,8 +41,8 @@ set_target_properties(rawtoaces_idt PROPERTIES
 
 install(FILES
     ${PROJECT_SOURCE_DIR}/include/rawtoaces/define.h
-    ${PROJECT_SOURCE_DIR}/include/rawtoaces/mathOps.h
-    ${PROJECT_SOURCE_DIR}/include/rawtoaces/rta.h
+    ${PROJECT_SOURCE_DIR}/include/rawtoaces/mathops.h
+    ${PROJECT_SOURCE_DIR}/include/rawtoaces/rawtoaces_idt.h
  	DESTINATION include/rawtoaces
 )
 
