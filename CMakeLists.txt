@@ -31,19 +31,18 @@ else()
 endif()
 set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Install directory for project CMake files" )
 
-# use, i.e. don't skip the full RPATH for the build tree
+set(CMAKE_MACOSX_RPATH FALSE)
+# ensure RPATH is not skipped for the build tree
 SET(CMAKE_SKIP_BUILD_RPATH FALSE)
-# when building, don't use the install RPATH already
-# (but later on when installing)
+# use RPATH in the build tree but strip it during installation
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
-# SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-# add the automatically determined parts of the RPATH
-# which point to directories outside the build tree to the install RPATH
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-# the RPATH to be used when installing, but only if it's not a system directory
+SET(CMAKE_INSTALL_RPATH "")  # Clear the install RPATH
+# disable automatic addition of RPATHs pointing to directories outside the build tree
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+# ensure no RPATH remains in installed binaries
 LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
 IF("${isSystemDir}" STREQUAL "-1")
-  SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+  SET(CMAKE_INSTALL_RPATH "")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 ## convert install paths to absolute
@@ -97,11 +96,6 @@ if ( WIN32 AND NOT CYGWIN )
 install( FILES "${PROJECT_BINARY_DIR}/RAWTOACESLibraryDepends.cmake" DESTINATION
   "${INSTALL_CMAKE_DIR}" COMPONENT dev )
 endif( )
-
-if(APPLE)
-  set(CMAKE_MACOSX_RPATH 0)
-  set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
-endif()
 
 if ( APPLE OR UNIX )
 	install (DIRECTORY data DESTINATION include/rawtoaces)

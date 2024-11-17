@@ -31,10 +31,13 @@ else ()
     target_link_libraries(${RAWTOACESLIB} PUBLIC ${libraw_LIBRARIES} ${libraw_LDFLAGS_OTHER} )
 endif ()
 
-
 set_target_properties( ${RAWTOACESLIB} PROPERTIES
   SOVERSION ${RAWTOACES_MAJOR_VERSION}.${RAWTOACES_MINOR_VERSION}.${RAWTOACES_PATCH_VERSION}
   VERSION ${RAWTOACES_VERSION} )
+
+set_target_properties(  ${RAWTOACESLIB} PROPERTIES
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+)
 
 install(FILES
   ${PROJECT_SOURCE_DIR}/include/rawtoaces/acesrender.h	 	

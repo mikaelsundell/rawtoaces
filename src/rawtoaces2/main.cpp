@@ -24,7 +24,8 @@ int main( int argc, const char *argv[] )
     std::cout << "Parse arguments" << std::endl
               << "-----------------------------------" << std::endl;
 
-    for (int i = 0; i < argc; ++i) {
+    for (int i = 0; i < argc; ++i)
+    {
         std::cout << argv[i] << std::endl;
     }
     

@@ -26,8 +26,13 @@ target_link_libraries ( rawtoaces_util2
     
 set_target_properties( rawtoaces_util2 PROPERTIES
     SOVERSION ${RAWTOACES_MAJOR_VERSION}.${RAWTOACES_MINOR_VERSION}.${RAWTOACES_PATCH_VERSION}
-    VERSION ${RAWTOACES_VERSION} )
+    VERSION ${RAWTOACES_VERSION} 
+)
 
+set_target_properties(rawtoaces_util2 PROPERTIES
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+)
+    
 install(
     FILES
         ${PROJECT_SOURCE_DIR}/include/rawtoaces/rawtoaces_util.h	 	
