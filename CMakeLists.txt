@@ -34,6 +34,7 @@ set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Install directory for
 
 if (APPLE)
   set(CMAKE_MACOSX_RPATH FALSE)
+  set(CMAKE_INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
 
 # convert install paths to absolute

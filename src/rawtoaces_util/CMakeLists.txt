@@ -30,11 +30,6 @@ set_target_properties(rawtoaces_util
     SOVERSION ${Rawtoaces_MAJOR_VERSION}.${Rawtoaces_MINOR_VERSION}.${Rawtoaces_PATCH_VERSION}
     VERSION ${Rawtoaces_VERSION} 
 )
-
-set_target_properties(rawtoaces_util
-    PROPERTIES
-    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
-)
     
 install(
     FILES ${PROJECT_SOURCE_DIR}/include/rawtoaces/rawtoaces_util.h	 	

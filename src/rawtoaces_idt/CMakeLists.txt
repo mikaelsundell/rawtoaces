@@ -35,10 +35,6 @@ set_target_properties(rawtoaces_idt PROPERTIES
     VERSION ${Rawtoaces_VERSION}
 )
 
-set_target_properties(rawtoaces_idt PROPERTIES
-    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
-)
-
 install(FILES
     ${PROJECT_SOURCE_DIR}/include/rawtoaces/define.h
     ${PROJECT_SOURCE_DIR}/include/rawtoaces/mathops.h
