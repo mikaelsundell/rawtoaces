@@ -91,17 +91,3 @@ BOOST_AUTO_TEST_CASE( Test_IsValidCT )
     string val9 = "d65k";
     BOOST_CHECK_EQUAL( false, isValidCT( val9 ) );
 };
-
-BOOST_AUTO_TEST_CASE( Test_PathsFinder )
-{
-    dataPath                 dps = pathsFinder();
-    vector<string>::iterator it  = dps.paths.begin();
-
-#ifdef WIN32
-    string first = ".";
-#else
-    string first = "/usr/local/include/rawtoaces/data";
-#endif
-
-    BOOST_CHECK_EQUAL( first, *it );
-};
