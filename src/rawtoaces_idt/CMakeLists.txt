@@ -6,7 +6,7 @@ add_library( rawtoaces_idt ${DO_SHARED}
     rawtoaces_idt.cpp
     # Make the headers visible in IDEs. This should not affect the builds.
     ../../include/rawtoaces/define.h
-    ../../include/rawtoaces/mathOps.h
+    ../../include/rawtoaces/mathops.h
     ../../include/rawtoaces/rawtoaces_idt.h
 )
 
