@@ -1,27 +1,26 @@
+# Copyright Contributors to the rawtoaces project.
+# SPDX-License-Identifier: Apache-2.0
+# https://github.com/AcademySoftwareFoundation/rawtoaces
+
 cmake_minimum_required(VERSION 3.5)
 include_directories( "${CMAKE_CURRENT_SOURCE_DIR}" )
 
-add_executable( rawtoaces
+add_executable( 
+    rawtoaces
     main.cpp
 )
 
-target_include_directories( rawtoaces
+set_property(TARGET rawtoaces PROPERTY CXX_STANDARD 17)
+
+target_include_directories(rawtoaces
     PUBLIC
-        ${AcesContainer_INCLUDE_DIRS}
+        ${OpenImageIO_INCLUDE_DIR}
 )
 
-target_link_libraries ( rawtoaces
+target_link_libraries( 
+    rawtoaces
     PUBLIC
-        ${RAWTOACESLIB}
-    INTERFACE
-        Boost::headers
+        rawtoaces_util
 )
 
-if ( LIBRAW_CONFIG_FOUND )
-    target_link_libraries ( rawtoaces PUBLIC libraw::raw )
-else ()
-    target_link_directories(rawtoaces PUBLIC ${libraw_LIBRARY_DIRS} )
-    target_link_libraries(rawtoaces PUBLIC ${libraw_LIBRARIES} ${libraw_LDFLAGS_OTHER} )
-endif ()
-
-install( TARGETS rawtoaces DESTINATION bin )
+install(TARGETS rawtoaces DESTINATION bin)

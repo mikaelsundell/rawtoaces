@@ -1,47 +1,44 @@
-cmake_minimum_required(VERSION 3.5)
+# Copyright Contributors to the rawtoaces project.
+# SPDX-License-Identifier: Apache-2.0
+# https://github.com/AcademySoftwareFoundation/rawtoaces
+
+add_library(rawtoaces_util ${DO_SHARED}
+    rawtoaces_util.cpp
+    ${PROJECT_SOURCE_DIR}/include/rawtoaces/rawtoaces_util.h
+)
+
+set_property(TARGET rawtoaces_util PROPERTY CXX_STANDARD 17)
+
 include_directories( "${CMAKE_CURRENT_SOURCE_DIR}" )
 
-add_library ( ${RAWTOACESLIB} ${DO_SHARED}
-    acesrender.cpp
-)
-
-if ( AcesContainer_FOUND )
-    target_include_directories ( ${RAWTOACESLIB} PRIVATE ${AcesContainer_INCLUDE_DIRS} )
-    target_link_directories    ( ${RAWTOACESLIB} PUBLIC  ${AcesContainer_LIBRARY_DIRS} )
-    target_link_libraries      ( ${RAWTOACESLIB}
-        PUBLIC
-            ${AcesContainer_LIBRARIES}
-            ${AcesContainer_LDFLAGS_OTHER}
-    )
-endif()
- 
-target_link_libraries ( ${RAWTOACESLIB}
+target_include_directories(rawtoaces_util PRIVATE ${OIIO_INCLUDE_DIRS} )
+target_link_directories(rawtoaces_util PUBLIC  ${OIIO_LIBRARY_DIRS} )
+target_link_libraries(rawtoaces_util
     PUBLIC
-        ${RAWTOACESIDTLIB}
-    INTERFACE
-        Eigen3::Eigen
-        Imath::Imath
-        Imath::ImathConfig
+        ${OIIO_LIBRARIES}
+        ${OIIO_LDFLAGS_OTHER}
+)
+ 
+target_link_libraries(rawtoaces_util
+    PUBLIC
+        rawtoaces_idt
+        OpenImageIO::OpenImageIO
 )
     
-if ( LIBRAW_CONFIG_FOUND )
-    target_link_libraries ( ${RAWTOACESLIB} PUBLIC libraw::raw )
-else ()
-    target_link_directories(${RAWTOACESLIB} PUBLIC ${libraw_LIBRARY_DIRS} )
-    target_link_libraries(${RAWTOACESLIB} PUBLIC ${libraw_LIBRARIES} ${libraw_LDFLAGS_OTHER} )
-endif ()
+set_target_properties(rawtoaces_util
+    PROPERTIES
+    SOVERSION ${Rawtoaces_MAJOR_VERSION}.${Rawtoaces_MINOR_VERSION}.${Rawtoaces_PATCH_VERSION}
+    VERSION ${Rawtoaces_VERSION} 
+)
 
-set_target_properties( ${RAWTOACESLIB} PROPERTIES
-  SOVERSION ${RAWTOACES_MAJOR_VERSION}.${RAWTOACES_MINOR_VERSION}.${RAWTOACES_PATCH_VERSION}
-  VERSION ${RAWTOACES_VERSION} )
-
-set_target_properties(  ${RAWTOACESLIB} PROPERTIES
+set_target_properties(rawtoaces_util
+    PROPERTIES
     INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
 )
-
-install(FILES
-  ${PROJECT_SOURCE_DIR}/include/rawtoaces/acesrender.h	 	
- 	DESTINATION include/rawtoaces
+    
+install(
+    FILES ${PROJECT_SOURCE_DIR}/include/rawtoaces/rawtoaces_util.h	 	
+    DESTINATION include/rawtoaces
 )
 
-install( TARGETS ${RAWTOACESLIB} DESTINATION lib )
+install(TARGETS rawtoaces_util DESTINATION lib)

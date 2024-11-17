@@ -3,9 +3,9 @@
 // https://github.com/AcademySoftwareFoundation/rawtoaces
 
 #include <rawtoaces/rawtoaces_util.h>
+#include <rawtoaces/rawtoaces_idt.h>
 #include <rawtoaces/define.h>
 #include <rawtoaces/metadata.h>
-#include <rawtoaces/rta.h>
 
 #include <OpenImageIO/imageio.h>
 #include <OpenImageIO/imagebuf.h>
@@ -325,6 +325,7 @@ bool check_param(
             return true;
         }
     }
+    return true;
 }
 
 bool ImageConverter::parse( int argc, const char *argv[] )

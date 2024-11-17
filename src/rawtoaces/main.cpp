@@ -1,156 +1,140 @@
-///////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2013 Academy of Motion Picture Arts and Sciences
-// ("A.M.P.A.S."). Portions contributed by others as indicated.
-// All rights reserved.
-//
-// A worldwide, royalty-free, non-exclusive right to copy, modify, create
-// derivatives, and use, in source and binary forms, is hereby granted,
-// subject to acceptance of this license. Performance of any of the
-// aforementioned acts indicates acceptance to be bound by the following
-// terms and conditions:
-//
-//  * Copies of source code, in whole or in part, must retain the
-//    above copyright notice, this list of conditions and the
-//    Disclaimer of Warranty.
-//
-//  * Use in binary form must retain the above copyright notice,
-//    this list of conditions and the Disclaimer of Warranty in the
-//    documentation and/or other materials provided with the distribution.
-//
-//  * Nothing in this license shall be deemed to grant any rights to
-//    trademarks, copyrights, patents, trade secrets or any other
-//    intellectual property of A.M.P.A.S. or any contributors, except
-//    as expressly stated herein.
-//
-//  * Neither the name "A.M.P.A.S." nor the name of any other
-//    contributors to this software may be used to endorse or promote
-//    products derivative of or based on this software without express
-//    prior written permission of A.M.P.A.S. or the contributors, as
-//    appropriate.
-//
-// This license shall be construed pursuant to the laws of the State of
-// California, and any disputes related thereto shall be subject to the
-// jurisdiction of the courts therein.
-//
-// Disclaimer of Warranty: THIS SOFTWARE IS PROVIDED BY A.M.P.A.S. AND
-// CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
-// BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT ARE DISCLAIMED. IN NO
-// EVENT SHALL A.M.P.A.S., OR ANY CONTRIBUTORS OR DISTRIBUTORS, BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, RESITUTIONARY,
-// OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-// THE POSSIBILITY OF SUCH DAMAGE.
-//
-// WITHOUT LIMITING THE GENERALITY OF THE FOREGOING, THE ACADEMY
-// SPECIFICALLY DISCLAIMS ANY REPRESENTATIONS OR WARRANTIES WHATSOEVER
-// RELATED TO PATENT OR OTHER INTELLECTUAL PROPERTY RIGHTS IN THE ACADEMY
-// COLOR ENCODING SYSTEM, OR APPLICATIONS THEREOF, HELD BY PARTIES OTHER
-// THAN A.M.P.A.S., WHETHER DISCLOSED OR UNDISCLOSED.
-///////////////////////////////////////////////////////////////////////////
+// Copyright Contributors to the rawtoaces project.
+// SPDX-License-Identifier: Apache-2.0
+// https://github.com/AcademySoftwareFoundation/rawtoaces
 
-#include <rawtoaces/acesrender.h>
-#include <rawtoaces/usage.h>
+#include <rawtoaces/rawtoaces_util.h>
 
-int main( int argc, char *argv[] )
+#include <filesystem>
+
+using namespace rta;
+
+int main( int argc, const char *argv[] )
 {
-    if ( argc == 1 )
-        usage( argv[0] );
+    std::cout << "rawtoaces2" << std::endl;
+    
+    std::cout << std::endl;
+    
+    ImageConverter converter;
 
-    struct stat st;
-    AcesRender &Render = AcesRender::getInstance();
-
-#ifndef WIN32
-    putenv( (char *)"TZ=UTC" );
-#else
-    _putenv( (char *)"TZ=UTC" );
-#endif
-
-    // Fetch conditions and conduct some pre-processing
-    Render.initialize( pathsFinder() );
-    int arg = Render.configureSettings( argc, argv );
-
-    // Gather all the raw images from arg list
-    vector<string> RAWs;
-    for ( ; arg < argc; arg++ )
+    if ( !converter.parse( argc, argv ) )
     {
-        if ( stat( argv[arg], &st ) != 0 )
+        return 1;
+    }
+
+    std::cout << "Parse arguments" << std::endl
+              << "-----------------------------------" << std::endl;
+
+    for (int i = 0; i < argc; ++i)
+    {
+        std::cout << argv[i] << std::endl;
+    }
+    
+    auto                    &argParse = converter.argParse();
+    auto                     files = argParse["filename"].as_vec<std::string>();
+    std::vector<std::string> files_to_convert;
+
+    for ( auto filename: files )
+    {
+        if ( !std::filesystem::exists( filename ) )
         {
-            fprintf(
-                stderr,
-                "Error: The directory or file may not exist - \"%s\"...",
-                argv[arg] );
-            continue;
+            std::cerr << "File or directory not found: " << filename
+                      << std::endl;
+            return 1;
         }
 
-        if ( st.st_mode & S_IFDIR )
+        auto canonical_filename = std::filesystem::canonical( filename );
+
+        if ( std::filesystem::is_directory( filename ) )
         {
-            vector<string> files = openDir( static_cast<string>( argv[arg] ) );
-            for ( vector<string>::iterator file = files.begin();
-                  file != files.end();
-                  ++file )
+            auto it = std::filesystem::directory_iterator( filename );
+
+            for ( auto filename2: it )
             {
-                if ( stat( file->c_str(), &st ) == 0 &&
-                     ( st.st_mode & S_IFREG ) )
-                    RAWs.push_back( *file );
+                if ( std::filesystem::is_regular_file( filename2 ) ||
+                     std::filesystem::is_symlink( filename2 ) )
+                {
+                    files_to_convert.push_back( filename2.path().string() );
+                }
             }
         }
-        else if ( st.st_mode & S_IFREG )
+        else if (
+            std::filesystem::is_regular_file( filename ) ||
+            std::filesystem::is_symlink( filename ) )
         {
-            RAWs.push_back( argv[arg] );
+            files_to_convert.push_back( filename );
+        }
+        else
+        {
+            std::cerr << "Not a file or directory: " << filename << std::endl;
+            return 1;
         }
     }
 
-    // Load illuminant dataset(s)
-    int    read = 0;
-    Option opts = Render.getSettings();
-    if ( !opts.illumType )
-        read = Render.fetchIlluminant();
-    else
-        read = Render.fetchIlluminant( opts.illumType );
-
-    if ( !read )
+    bool result = true;
+    for ( auto const &input_filename: files_to_convert )
     {
-        fprintf(
-            stderr,
-            "\nError: No matching light source. "
-            "Please find available options by "
-            "\"rawtoaces --valid-illum\".\n" );
-        exit( -1 );
-    }
-
-    // Process RAW files ...
-    FORI( RAWs.size() )
-    {
-        string raw = ( RAWs[i] ).c_str();
-
-        timerstart_timeval();
-        Render.preprocessRaw( raw.c_str() );
-        if ( opts.use_timing )
-            timerprint( "AcesRender::preprocessRaw()", raw.c_str() );
-
-        timerstart_timeval();
-        Render.postprocessRaw();
-        if ( opts.use_timing )
-            timerprint( "AcesRender::postprocessRaw()", raw.c_str() );
-
-        timerstart_timeval();
-
-        string output;
-        size_t pos = raw.rfind( '.' );
+        std::string output_filename = input_filename;
+        size_t      pos             = input_filename.rfind( '.' );
         if ( pos != std::string::npos )
         {
-            output = raw.substr( 0, pos );
+            output_filename = input_filename.substr( 0, pos );
         }
-        output += "_aces.exr";
+        output_filename += "_oiio.exr";
+        
+        std::cout << std::endl;
 
-        Render.outputACES( output.c_str() );
-        if ( opts.use_timing )
-            timerprint( "AcesRender::outputACES()", raw.c_str() );
+        std::cout << "Configure conversion" << std::endl
+                  << "-----------------------------------" << std::endl;
+        
+        if ( !converter.configure( input_filename ) )
+        {
+            std::cerr << "Failed to configure the reader for the file: "
+                      << input_filename << std::endl;
+            result = false;
+            continue;
+        }
+        
+        std::cout << std::endl;
+
+        std::cout << "Load file: " << input_filename << std::endl
+                  << "-----------------------------------" << std::endl;
+
+        
+        if ( !converter.load( input_filename ) )
+        {
+            std::cerr << "Failed to read for the file: " << input_filename
+                      << std::endl;
+            result = false;
+            continue;
+        }
+        
+        std::cout << std::endl;
+
+        std::cout << "Process conversion" << std::endl
+                  << "-----------------------------------" << std::endl;
+        
+        if ( !converter.process() )
+        {
+            std::cerr << "Failed to convert the file: " << input_filename
+                      << std::endl;
+            result = false;
+            continue;
+        }
+        
+        std::cout << std::endl;
+
+        std::cout << "Save to file: " << output_filename << std::endl
+                  << "-----------------------------------" << std::endl;
+
+        if ( !converter.save( output_filename ) )
+        {
+            std::cerr << "Failed to save the file: " << output_filename
+                      << std::endl;
+            result = false;
+            continue;
+        }
+        
+        std::cout << "Conversion successful" << std::endl;
     }
-
-    return 0;
+    return result ? 0 : 1;
 }
