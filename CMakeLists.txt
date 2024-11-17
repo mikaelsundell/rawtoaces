@@ -9,7 +9,7 @@ set(Rawtoaces_MAJOR_VERSION 1)
 set(Rawtoaces_MINOR_VERSION 0)
 set(Rawtoaces_PATCH_VERSION 0)
 set(Rawtoaces_VERSION ${Rawtoaces_MAJOR_VERSION}.${Rawtoaces_MINOR_VERSION}.${Rawtoaces_PATCH_VERSION})
-Rawtoaces
+
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     add_compile_options ( /W0 )
     add_compile_definitions( NOMINMAX )
