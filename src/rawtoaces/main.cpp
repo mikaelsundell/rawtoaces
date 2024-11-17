@@ -10,6 +10,7 @@ using namespace rawtoaces;
 
 int main( int argc, const char *argv[] )
 {
+    std::cout << "rawtoaces" << std::endl;
     ImageConverter converter;
     if ( !converter.parse( argc, argv ) )
     {
@@ -19,7 +20,7 @@ int main( int argc, const char *argv[] )
     auto &argParse = converter.argParse();
     auto inputfilename = argParse["input-filename"].as_string();
     auto outputfilename = argParse["output-filename"].as_string();
-    std::cout << "** Configure conversion" << std::endl
+    std::cout << "** Configure conversion" << std::endl;
     
     if (!converter.configure(inputfilename))
     {
@@ -30,7 +31,7 @@ int main( int argc, const char *argv[] )
     
     std::cout << std::endl;
 
-    std::cout << "** Load file: " << inputfilename << std::endl
+    std::cout << "** Load file: " << inputfilename << std::endl;
 
     if (!converter.load(inputfilename))
     {
@@ -41,7 +42,7 @@ int main( int argc, const char *argv[] )
     
     std::cout << std::endl;
 
-    std::cout << "** Process conversion" << std::endl
+    std::cout << "** Process conversion" << std::endl;
     
     if (!converter.process())
     {

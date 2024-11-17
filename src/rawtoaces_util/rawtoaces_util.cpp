@@ -343,11 +343,13 @@ bool ImageConverter::parse( int argc, const char *argv[] )
     
     if (_argParse["input-filename"].get().size() == 0) {
         std::cerr << "--input-filename is required.\n";
+        _argParse.print_help();
         return false;
     }
 
     if (_argParse["output-filename"].get().size() == 0) {
         std::cerr << "--output-filename is required.\n";
+        _argParse.print_help();
         return false;
     }
     
