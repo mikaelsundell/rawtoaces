@@ -631,7 +631,7 @@ int Spst::loadSpst( const string &path, const char *maker, const char *model )
         exit( -1 );
     }
 
-    _spstMaxCol = max_element( max.begin(), max.end() ) - max.begin();
+    _spstMaxCol = static_cast<int>(max_element( max.begin(), max.end() ) - max.begin());
     setSensitivity( rgbsen );
 
     return 1;
@@ -783,7 +783,7 @@ void Idt::scaleLSC( Illum &Illuminant )
 {
     assert( _cameraSpst._spstMaxCol >= 0 && ( Illuminant._data ).size() != 0 );
 
-    int            size = _cameraSpst._rgbsen.size();
+    int            size = static_cast<int>(_cameraSpst._rgbsen.size());
     vector<double> colMax( size, 1.0 );
     switch ( _cameraSpst._spstMaxCol )
     {
