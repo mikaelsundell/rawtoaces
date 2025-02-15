@@ -16,7 +16,7 @@
 namespace rawtoaces
 {
 
-std::string findFile( const std::string &filename, const std::string& datapath )
+std::string findFile( const std::string &filename, const std::string &datapath )
 {
     std::string full_path = datapath + "/" + filename;
     if ( std::filesystem::exists( full_path ) )
@@ -24,12 +24,13 @@ std::string findFile( const std::string &filename, const std::string& datapath )
     return "";
 }
 
-std::vector<std::string> collectDataFiles( const std::string &type, const std::string& datapath )
+std::vector<std::string>
+collectDataFiles( const std::string &type, const std::string &datapath )
 {
     std::vector<std::string> result;
-    
+
     auto it = std::filesystem::directory_iterator( datapath + "/" + type );
-    
+
     for ( auto filename2: it )
     {
         auto p = filename2.path();
@@ -109,23 +110,21 @@ void ImageConverter::initArgParse()
     _argParse.add_version( "VERSION NUMBER" );
 
     _argParse.arg( "--input-filename" )
-        .help(
-            "Input filename of raw image file." )
+        .help( "Input filename of raw image file." )
         .metavar( "STR" )
         .action( OIIO::ArgParse::store() );
-    
+
     _argParse.arg( "--output-filename" )
-        .help(
-            "Output filename of Aces EXR file." )
+        .help( "Output filename of Aces EXR file." )
         .metavar( "STR" )
         .action( OIIO::ArgParse::store() );
-    
+
     _argParse.arg( "--data-path" )
         .help(
             "AMPAS data path for camera, cmf, illuminant and training data." )
         .metavar( "STR" )
         .action( OIIO::ArgParse::store() );
-    
+
     _argParse.arg( "--wb-method" )
         .help(
             "White balance method. Supported options: metadata, illuminant, "
@@ -340,22 +339,24 @@ bool ImageConverter::parse( int argc, const char *argv[] )
     {
         return false;
     }
-    
-    if (_argParse["input-filename"].get().size() == 0) {
+
+    if ( _argParse["input-filename"].get().size() == 0 )
+    {
         std::cerr << "--input-filename is required.\n";
         _argParse.print_help();
         return false;
     }
 
-    if (_argParse["output-filename"].get().size() == 0) {
+    if ( _argParse["output-filename"].get().size() == 0 )
+    {
         std::cerr << "--output-filename is required.\n";
         _argParse.print_help();
         return false;
     }
-    
+
     datapath = _argParse["data-path"].get();
 
-    if (_argParse["list-cameras"].get<int>() )
+    if ( _argParse["list-cameras"].get<int>() )
     {
         std::cout
             << "Spectral sensitivity data are available for the following cameras:"
@@ -389,8 +390,8 @@ bool ImageConverter::parse( int argc, const char *argv[] )
                   << std::endl;
         std::cout << "- Black-body radiation (e.g., 3200K)" << std::endl;
 
-        Idt                      idt;
-        auto                     paths = collectDataFiles( "illuminant", datapath );
+        Idt  idt;
+        auto paths = collectDataFiles( "illuminant", datapath );
         std::vector<std::string> illuminants;
         for ( auto path: paths )
         {
@@ -808,18 +809,17 @@ void ImageConverter::applyMatrix(
 bool ImageConverter::process()
 {
 
-    
     if ( _IDT_matrix.size() )
     {
         std::cout << "Apply IDT matrix" << std::endl;
-        
+
         applyMatrix( _IDT_matrix );
     }
 
     if ( _CAT_matrix.size() )
     {
         std::cout << "Apply CAT matrix" << std::endl;
-        
+
         applyMatrix( _CAT_matrix );
 
         _imageBuffer = OIIO::ImageBufAlgo::colormatrixtransform(
@@ -856,7 +856,7 @@ void ImageConverter::prepareIDT_spectral(
     std::string lower_illuminant( illuminant );
 
     std::cout << "Load lower illuminant" << std::endl;
-    
+
     if ( lower_illuminant.length() == 0 )
         lower_illuminant = "na";
     else
@@ -867,7 +867,7 @@ void ImageConverter::prepareIDT_spectral(
             lower_illuminant.begin(),
             []( unsigned char c ) { return std::tolower( c ); } );
     }
-    
+
     std::cout << "Illuminant data used: " << lower_illuminant << std::endl;
 
     Idt idt;
@@ -880,7 +880,7 @@ void ImageConverter::prepareIDT_spectral(
 
     std::cout << "Load spectral sensitivity data for camera: " << _cameraMake
               << " " << _cameraModel << std::endl;
-    
+
     for ( auto &path: camera_paths )
     {
         if ( idt.loadCameraSpst(
@@ -888,7 +888,7 @@ void ImageConverter::prepareIDT_spectral(
         {
             std::cout << "Camera data used: " << _cameraMake << " "
                       << _cameraModel << std::endl;
-            
+
             found_camera = true;
             break;
         }
@@ -899,14 +899,14 @@ void ImageConverter::prepareIDT_spectral(
     {
         idt.loadTrainingData( training );
     }
-    
+
     std::cout << "Load CMF data" << std::endl;
 
     auto cmf = findFile( "cmf/cmf_1931.json", datapath );
     if ( cmf.length() )
     {
         std::cout << "CMF data used: " << lower_illuminant << std::endl;
-        
+
         idt.loadCMF( cmf );
     }
 

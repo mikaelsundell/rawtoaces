@@ -399,8 +399,9 @@ solveVM( const vector<vector<T>> &vct1, const vector<vector<T>> &vct2 )
     FORIJ( vct2.size(), vct2[0].size() )
     m2( i, j ) = vct2[i][j];
 
-    Eigen::JacobiSVD<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>> svd(m1, Eigen::ComputeThinU | Eigen::ComputeThinV);
-    m3 = svd.solve(m2);
+    Eigen::JacobiSVD<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>> svd(
+        m1, Eigen::ComputeThinU | Eigen::ComputeThinV );
+    m3 = svd.solve( m2 );
 
     vector<vector<T>> vct3( m3.rows(), vector<T>( m3.cols() ) );
     FORIJ( m3.rows(), m3.cols() ) vct3[i][j] = m3( i, j );

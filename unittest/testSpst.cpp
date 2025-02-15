@@ -18,7 +18,7 @@
 using namespace std;
 using namespace rawtoaces;
 
-BOOST_AUTO_TEST_CASE(TestSpst_DefaultConstructor)
+BOOST_AUTO_TEST_CASE( TestSpst_DefaultConstructor )
 {
     char   *brand;
     char   *model;
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(TestSpst_DefaultConstructor)
     }
 };
 
-BOOST_AUTO_TEST_CASE(TestSpst_Constructor2)
+BOOST_AUTO_TEST_CASE( TestSpst_Constructor2 )
 {
     char   *brand;
     char   *model;
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(TestSpst_Constructor2)
     }
 };
 
-BOOST_AUTO_TEST_CASE(TestSpst_CopyConstructor)
+BOOST_AUTO_TEST_CASE( TestSpst_CopyConstructor )
 {
     char   *brand;
     char   *model;
@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(TestSpst_CopyConstructor)
     }
 };
 
-BOOST_AUTO_TEST_CASE(TestSpst_LoadSpst)
+BOOST_AUTO_TEST_CASE( TestSpst_LoadSpst )
 {
     uint8_t len   = 6;
     char   *brand = (char *)malloc( len + 1 );
@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_CASE(TestSpst_LoadSpst)
     delete spstTest;
 };
 
-BOOST_AUTO_TEST_CASE(TestSpst_DataAccess)
+BOOST_AUTO_TEST_CASE( TestSpst_DataAccess )
 {
     char   *brand1, *brand2, *brand3;
     char   *model1, *model2, *model3;
