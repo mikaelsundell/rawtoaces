@@ -6,7 +6,7 @@
 #include <rawtoaces/define.h>
 #include <rawtoaces/metadata.h>
 #include <rawtoaces/rta.h>
-#include <rawtoaces/mathOps.h>
+#include <rawtoaces/mathops.h>
 
 #include "transform_cache.h"
 

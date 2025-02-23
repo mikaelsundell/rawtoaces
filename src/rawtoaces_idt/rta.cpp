@@ -53,7 +53,7 @@
 ///////////////////////////////////////////////////////////////////////////
 
 #include <rawtoaces/rta.h>
-#include <rawtoaces/mathOps.h>
+#include <rawtoaces/mathops.h>
 
 #include <fstream>
 #include <nlohmann/json.hpp>

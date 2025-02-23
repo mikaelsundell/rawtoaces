@@ -59,7 +59,7 @@
 
 #include <OpenImageIO/unittest.h>
 
-#include <rawtoaces/mathOps.h>
+#include <rawtoaces/mathops.h>
 #include <rawtoaces/rta.h>
 
 using namespace std;

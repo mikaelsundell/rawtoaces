@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // https://github.com/AcademySoftwareFoundation/rawtoaces
 
-#ifndef _RAWTOACES_UTIL_H_
-#define _RAWTOACES_UTIL_H_
+#pragma once
 
 #include <OpenImageIO/argparse.h>
 #include <OpenImageIO/imageio.h>
@@ -207,5 +206,3 @@ private:
 };
 
 } // namespace rta
-
-#endif // _RAWTOACES_UTIL_H_
