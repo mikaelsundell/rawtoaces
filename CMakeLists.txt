@@ -69,10 +69,10 @@ endforeach ()
 
 option (ENABLE_SHARED "Enable Shared Libraries" ON)
 
-if ( ENABLE_SHARED )
-  set ( DO_SHARED SHARED )
+if ( NABLE_SHARED)
+    set (DO_SHARED SHARED)
 else ()
-  set ( DO_SHARED STATIC )
+    set (DO_SHARED STATIC)
 endif ()
 
 include ( configure.cmake )
@@ -96,7 +96,8 @@ configure_file (config/RawToAcesConfigVersion.cmake.in "${PROJECT_BINARY_DIR}/Ra
 
 if (PKG_CONFIG_FOUND)
     configure_file (config/RawToAces.pc.in "${PROJECT_BINARY_DIR}/RawToAces.pc" @ONLY)
-    install (FILES "${PROJECT_BINARY_DIR}/RawToAces.pc" DESTINATION lib/pkgconfig COMPONENT dev)
+    install (FILES "${PROJECT_BINARY_DIR}/RawToAces.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig" COMPONENT dev
+)
 endif()
 
 install (FILES
