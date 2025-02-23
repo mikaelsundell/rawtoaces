@@ -4,7 +4,7 @@
 
 #include "transform_cache.h"
 
-#include <rawtoaces/mathOps.h>
+#include <rawtoaces/mathops.h>
 #include <rawtoaces/rta.h>
 
 namespace rta

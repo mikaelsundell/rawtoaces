@@ -28,7 +28,8 @@ The source code contains the following:
 * [`data/`](./data) - Data files containing camera sensitivity, light source, color matching function and 190 training patch data
 * [`lib/`](./lib) - IDT and math libraries
 * [`src/`](./src) - AcesRender wrapper library and C++ header file containing `rawtoaces` usage information
-* [`test/`](./test) - Sample testing materials such as a ".NEF" RAW image and a camera spectral sensitivity data file
+* [`unittest/`](./unittest) - Unit tests
+* [`unittest/materials`](./unittest/materials) - Sample testing materials such as a ".NEF" RAW image and a camera spectral sensitivity data file
 * [`main.cpp`](main.cpp) - C++ source code file for call routines to process images
 
 ## Prerequisites
