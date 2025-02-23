@@ -20,7 +20,7 @@ set (RawToAces2_BIN "rawtoaces2")
 set (CMAKE_MACOSX_RPATH 1)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    add_compile_options (/W)
+    add_compile_options (/W0)
     add_compile_definitions (NOMINMAX)
     add_compile_options ($<$<COMPILE_LANGUAGE:CXX>:/utf-8>)
 endif ()
@@ -111,7 +111,6 @@ endif ()
 
 if (APPLE OR UNIX)
 	include (GNUInstallDirs)
-
 	install(
         TARGETS ${RawToAcesIdt_LIB} ${RawToAcesUtil_LIB} ${RawToAcesUtil2_LIB} ${RawToAces_BIN} ${RawToAces2_BIN}
         EXPORT RawToAcesConfig
