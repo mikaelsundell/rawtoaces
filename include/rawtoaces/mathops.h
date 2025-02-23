@@ -451,8 +451,8 @@ solveVM( const vector<vector<T>> &vct1, const vector<vector<T>> &vct2 )
     m2( i, j ) = vct2[i][j];
 
     // colPivHouseholderQr()
-    //m3 = m1.jacobiSvd( Eigen::ComputeThinU | Eigen::ComputeThinV ).solve( m2 );
-    m3 = m1.colPivHouseholderQr().solve(m2);
+    // m3 = m1.jacobiSvd( Eigen::ComputeThinU | Eigen::ComputeThinV ).solve( m2 );
+    m3 = m1.colPivHouseholderQr().solve( m2 );
 
     vector<vector<T>> vct3( m3.rows(), vector<T>( m3.cols() ) );
     FORIJ( m3.rows(), m3.cols() ) vct3[i][j] = m3( i, j );
