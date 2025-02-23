@@ -81,10 +81,10 @@ include ( configure.cmake )
 # to add to include path
 include_directories ("${PROJECT_SOURCE_DIR}/include")
 
-add_definitions ( -DPACKAGE="RawToAces" -DVERSION="${RawToAces_VERSION}" )
-add_subdirectory ("src/${RawToAcesIdt_LIB}")
-add_subdirectory ("src/${RawToAcesUtil_LIB}")
-add_subdirectory ("src/${RawToAcesUtil2_LIB}")
+add_definitions (-DPACKAGE="${PROJECT_NAME}" -DVERSION="${RawToAces_VERSION}")
+add_subdirectory ("src/rawtoaces_idt")
+add_subdirectory ("src/rawtoaces_util")
+add_subdirectory ("src/rawtoaces_util2")
 add_subdirectory ("src/rawtoaces")
 add_subdirectory ("src/rawtoaces2")
  
