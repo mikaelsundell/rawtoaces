@@ -12,7 +12,7 @@ set_property(TARGET Test_Spst PROPERTY CXX_STANDARD 17)
 target_link_libraries (
     Test_Spst
     PUBLIC
-        ${RAWTOACESLIB}
+        ${RawToAcesIdt_LIB}
         OpenImageIO::OpenImageIO
 )
 
@@ -26,7 +26,7 @@ set_property(TARGET Test_IDT PROPERTY CXX_STANDARD 17)
 target_link_libraries (
     Test_IDT
     PUBLIC
-        ${RAWTOACESLIB}
+        ${RawToAcesIdt_LIB}
         OpenImageIO::OpenImageIO
 )
 
@@ -40,7 +40,7 @@ set_property (TARGET Test_Illum PROPERTY CXX_STANDARD 17)
 target_link_libraries (
     Test_Illum
     PUBLIC
-        ${RAWTOACESLIB}
+        ${RawToAcesIdt_LIB}
         OpenImageIO::OpenImageIO
 )
 
@@ -54,7 +54,7 @@ set_property (TARGET Test_DNGIdt PROPERTY CXX_STANDARD 17)
 target_link_libraries (
     Test_DNGIdt
     PUBLIC
-        ${RAWTOACESLIB}
+        ${RawToAcesIdt_LIB}
         OpenImageIO::OpenImageIO
 )
 
@@ -76,7 +76,7 @@ set_property (TARGET Test_Math PROPERTY CXX_STANDARD 17)
 target_link_libraries (
     Test_Math
     PUBLIC
-        ${RAWTOACESLIB}
+        ${RawToAcesIdt_LIB}
         OpenImageIO::OpenImageIO
 )
 
@@ -90,7 +90,7 @@ set_property (TARGET Test_Logic PROPERTY CXX_STANDARD 17)
 target_link_libraries (
     Test_Logic
     PUBLIC
-        ${RAWTOACESLIB}
+        ${RawToAcesIdt_LIB}
         OpenImageIO::OpenImageIO
 )
 
@@ -104,7 +104,7 @@ set_property (TARGET Test_Misc PROPERTY CXX_STANDARD 17)
 target_link_libraries (
     Test_Misc
     PUBLIC
-        ${RAWTOACESLIB}
+        ${RawToAcesIdt_LIB}
         OpenImageIO::OpenImageIO
 )
 

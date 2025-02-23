@@ -39,7 +39,7 @@ install(
     FILES
         ${PROJECT_SOURCE_DIR}/include/rawtoaces/rawtoaces_util.h
         ${PROJECT_SOURCE_DIR}/include/rawtoaces/cache_base.h	 	
-    DESTINATION include/rawtoaces
+    DESTINATION include/${PROJECT_NAME}
 )
 
 install (TARGETS ${RawToAcesUtil2_LIB} DESTINATION lib)

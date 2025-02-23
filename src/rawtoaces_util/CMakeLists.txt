@@ -43,7 +43,7 @@ set_target_properties (${RawToAcesUtil_LIB} PROPERTIES
 
 install(FILES
     ${PROJECT_SOURCE_DIR}/include/rawtoaces/acesrender.h	 	
- 	DESTINATION include/rawtoaces
+ 	DESTINATION include/${PROJECT_NAME}
 )
 
 install (TARGETS ${RAWTOACESLIB} DESTINATION lib)

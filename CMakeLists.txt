@@ -95,14 +95,14 @@ configure_file (config/RawToAcesConfig.cmake.in "${PROJECT_BINARY_DIR}/RawToAces
 configure_file (config/RawToAcesConfigVersion.cmake.in "${PROJECT_BINARY_DIR}/RawToAcesConfigVersion.cmake" @ONLY)
 
 if (PKG_CONFIG_FOUND)
-  configure_file (config/RawToAces.pc.in "${PROJECT_BINARY_DIR}/RawToAces.pc" @ONLY)
-  install (FILES "${PROJECT_BINARY_DIR}/RawToAces.pc" DESTINATION lib/pkgconfig COMPONENT dev)
+    configure_file (config/RawToAces.pc.in "${PROJECT_BINARY_DIR}/RawToAces.pc" @ONLY)
+    install (FILES "${PROJECT_BINARY_DIR}/RawToAces.pc" DESTINATION lib/pkgconfig COMPONENT dev)
 endif()
 
-install( FILES
-  "${PROJECT_BINARY_DIR}/RawToAcesConfig.cmake"
-  "${PROJECT_BINARY_DIR}/RawToAcesConfigVersion.cmake"
-  DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+install (FILES
+    "${PROJECT_BINARY_DIR}/RawToAcesConfig.cmake"
+    "${PROJECT_BINARY_DIR}/RawToAcesConfigVersion.cmake"
+    DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
 
 if (WIN32 AND NOT CYGWIN)
     install (FILES "${PROJECT_BINARY_DIR}/RawToAcesLibraryDepends.cmake" DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)

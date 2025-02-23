@@ -19,7 +19,7 @@ target_include_directories (
 target_link_libraries (
     ${RawToAces2_BIN}
     PUBLIC
-        rawtoaces_util2
+        ${RawToAcesUtil2_LIB}
 )
 
 set_target_properties (${RawToAces2_BIN} PROPERTIES XCODE_SCHEME_ARGUMENTS "${CMAKE_XCODE_SCHEME_ARGUMENTS}")

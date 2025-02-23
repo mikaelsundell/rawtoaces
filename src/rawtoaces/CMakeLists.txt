@@ -6,19 +6,19 @@ add_executable (
     main.cpp
 )
 
-set_property (TARGET rawtoaces PROPERTY CXX_STANDARD 17)
+set_property (TARGET ${RawToAces_BIN} PROPERTY CXX_STANDARD 17)
 
 target_link_libraries (
     ${RawToAces_BIN}
     PUBLIC
-        ${RAWTOACESLIB}
+        ${RawToAcesUtil_LIB}
 )
 
 if (LIBRAW_CONFIG_FOUND)
-    target_link_libraries (${RawToAces_BIN} PUBLIC libraw::raw )
+    target_link_libraries (${RawToAces_BIN} PUBLIC libraw::raw)
 else ()
-    target_link_directories (${RawToAces_BIN} PUBLIC ${libraw_LIBRARY_DIRS} )
-    target_link_libraries (${RawToAces_BIN} PUBLIC ${libraw_LIBRARIES} ${libraw_LDFLAGS_OTHER} )
+    target_link_directories (${RawToAces_BIN} PUBLIC ${libraw_LIBRARY_DIRS})
+    target_link_libraries (${RawToAces_BIN} PUBLIC ${libraw_LIBRARIES} ${libraw_LDFLAGS_OTHER})
 endif ()
 
 install (TARGETS ${RawToAces_BIN} DESTINATION bin )
