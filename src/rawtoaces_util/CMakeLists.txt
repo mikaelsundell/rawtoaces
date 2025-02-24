@@ -8,7 +8,7 @@ add_library (
     ${RawToAcesUtil_LIB} ${DO_SHARED}
     acesrender.cpp
     # make the headers visible in IDEs. This should not affect the builds.
-    ../../include/rawtoaces/acesrender.h
+    ${RawToAces_INCLUDE_DIR}/rawtoaces/acesrender.h
 )
 
 set_property(TARGET ${RawToAcesUtil_LIB} PROPERTY CXX_STANDARD 17)
@@ -28,7 +28,7 @@ target_link_libraries (${RawToAcesUtil_LIB}
         Imath::Imath
         Imath::ImathConfig
 )
-    
+ 
 if (LIBRAW_CONFIG_FOUND)
     target_link_libraries (${RawToAcesUtil_LIB} PUBLIC libraw::raw)
 else ()
@@ -37,12 +37,14 @@ else ()
     target_link_libraries (${RawToAcesUtil_LIB} PUBLIC ${libraw_LIBRARIES} ${libraw_LDFLAGS_OTHER})
 endif ()
 
-set_target_properties (${RawToAcesUtil_LIB} PROPERTIES
-    SOVERSION ${RawToAces_MAJOR_VERSION}.${RawToAces_MINOR_VERSION}.${RawToAces_PATCH_VERSION}
-    VERSION ${RawToAces_VERSION})
-
+set_target_properties(
+    ${RawToAcesUtil_LIB} PROPERTIES
+    SOVERSION ${RawToAces_MAJOR_VERSION}
+    VERSION ${RawToAces_VERSION}
+)
+       
 install(FILES
-    ${PROJECT_SOURCE_DIR}/include/rawtoaces/acesrender.h	 	
+    ${RawToAces_INCLUDE_DIR}/rawtoaces/acesrender.h	 	
  	DESTINATION include/${PROJECT_NAME}
 )
 

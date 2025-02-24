@@ -8,10 +8,10 @@ add_library (
     ${RawToAcesIdt_LIB} ${DO_SHARED}
     rta.cpp
     # make the headers visible in IDEs. This should not affect the builds.
-    ../../include/rawtoaces/define.h
-    ../../include/rawtoaces/mathops.h
-    ../../include/rawtoaces/rta.h
-    ../../include/rawtoaces/metadata.h
+    ${RawToAces_INCLUDE_DIR}/rawtoaces/define.h
+    ${RawToAces_INCLUDE_DIR}/rawtoaces/mathops.h
+    ${RawToAces_INCLUDE_DIR}/rawtoaces/rta.h
+    ${RawToAces_INCLUDE_DIR}/rawtoaces/metadata.h
 )
 set_property (TARGET ${RawToAcesIdt_LIB} PROPERTY CXX_STANDARD 17)
 
@@ -32,17 +32,17 @@ else ()
     target_link_libraries (${RawToAcesIdt_LIB} PUBLIC ${CERES_LIBRARIES})
 endif ()
 
-
-set_target_properties (${RawToAcesIdt_LIB} PROPERTIES
-    SOVERSION ${RawToAces_MAJOR_VERSION}.${RawToAces_MINOR_VERSION}.${RawToAces_PATCH_VERSION}
+set_target_properties(
+    ${RawToAcesIdt_LIB} PROPERTIES
+    SOVERSION ${RawToAces_MAJOR_VERSION}
     VERSION ${RawToAces_VERSION}
 )
 
 install (FILES
-    ${PROJECT_SOURCE_DIR}/include/rawtoaces/define.h
-    ${PROJECT_SOURCE_DIR}/include/rawtoaces/mathops.h
-    ${PROJECT_SOURCE_DIR}/include/rawtoaces/rta.h
-    ${PROJECT_SOURCE_DIR}/include/rawtoaces/metadata.h
+    ${RawToAces_INCLUDE_DIR}/rawtoaces/define.h
+    ${RawToAces_INCLUDE_DIR}/rawtoaces/mathops.h
+    ${RawToAces_INCLUDE_DIR}/rawtoaces/rta.h
+    ${RawToAces_INCLUDE_DIR}/rawtoaces/metadata.h
     DESTINATION include/rawtoaces
 )
 

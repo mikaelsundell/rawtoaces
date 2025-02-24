@@ -8,8 +8,8 @@ add_library (${RawToAcesUtil2_LIB} ${DO_SHARED}
     transform_cache.cpp
     transform_cache.h
     rawtoaces_util.cpp
-    ${PROJECT_SOURCE_DIR}/include/rawtoaces/rawtoaces_util.h
-    ${PROJECT_SOURCE_DIR}/include/rawtoaces/cache_base.h
+    ${RawToAces_INCLUDE_DIR}/rawtoaces/rawtoaces_util.h
+    ${RawToAces_INCLUDE_DIR}/rawtoaces/cache_base.h
 )
 
 set_property (TARGET ${RawToAcesUtil2_LIB} PROPERTY CXX_STANDARD 17)
@@ -31,14 +31,16 @@ target_link_libraries (${RawToAcesUtil2_LIB}
         OpenImageIO::OpenImageIO
 )
     
-set_target_properties(${RawToAcesUtil2_LIB} PROPERTIES
-    SOVERSION ${RawToAces_MAJOR_VERSION}.${RawToAces_MINOR_VERSION}.${RawToAces_PATCH_VERSION}
-    VERSION ${RawToAces_VERSION})
+set_target_properties(
+    ${RawToAcesUtil2_LIB} PROPERTIES
+    SOVERSION ${RawToAces_MAJOR_VERSION}
+    VERSION ${RawToAces_VERSION}
+)
 
 install(
     FILES
-        ${PROJECT_SOURCE_DIR}/include/rawtoaces/rawtoaces_util.h
-        ${PROJECT_SOURCE_DIR}/include/rawtoaces/cache_base.h	 	
+         ${RawToAces_INCLUDE_DIR}/rawtoaces/rawtoaces_util.h
+         ${RawToAces_INCLUDE_DIR}/rawtoaces/cache_base.h	 	
     DESTINATION include/${PROJECT_NAME}
 )
 

@@ -5,10 +5,11 @@
 cmake_minimum_required (VERSION 3.10)
 project (RawToAces)
 
-set (RawToAces_MAJOR_VERSION 1)
+
+set (RawToAces_MAJOR_VERSION 2)
 set (RawToAces_MINOR_VERSION 0)
 set (RawToAces_PATCH_VERSION 1)
-set (RawToAces_VERSION ${RAWTOACES_MAJOR_VERSION}.${RAWTOACES_MINOR_VERSION}.${RAWTOACES_PATCH_VERSION})
+set (RawToAces_VERSION ${RawToAces_MAJOR_VERSION}.${RawToAces_MINOR_VERSION}.${RawToAces_PATCH_VERSION})
 
 set (RawToAcesIdt_LIB "RawToAces_idt")
 set (RawToAcesUtil_LIB "RawToAces_util")
@@ -17,7 +18,7 @@ set (RawToAcesUtil2_LIB "RawToAces_util2")
 set (RawToAces_BIN "rawtoaces")
 set (RawToAces2_BIN "rawtoaces2")
 
-set (CMAKE_MACOSX_RPATH 1)
+set (RawToAces_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/src/include")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     add_compile_options (/W0)
@@ -25,19 +26,18 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     add_compile_options ($<$<COMPILE_LANGUAGE:CXX>:/utf-8>)
 endif ()
 
-if (NOT CONFIGURED_ONCE)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${warnings}")
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${warnings}")
-endif ()
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${warnings}")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${warnings}")
+set (CMAKE_DEBUG_POSTFIX "_d" )
 
 # make install directories overridable
 set (INSTALL_LIB_DIR lib CACHE PATH "Install directory for libraries")
 set (INSTALL_BIN_DIR bin CACHE PATH "Install directory for executable binaries")
 set (INSTALL_INCLUDE_DIR include CACHE PATH "Install directory for public header files")
 if (WIN32 AND NOT CYGWIN )
-    set (DEF_INSTALL_CMAKE_DIR CMake)
+    set (DEF_INSTALL_CMAKE_DIR cmake)
 else ()
-    set (DEF_INSTALL_CMAKE_DIR lib/CMake/${PROJECT_NAME})
+    set (DEF_INSTALL_CMAKE_DIR lib/cmake/${PROJECT_NAME})
 endif ()
 set (INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Install directory for project CMake files")
 
@@ -48,7 +48,6 @@ set (CMAKE_SKIP_BUILD_RPATH FALSE)
 # (but later on when installing)
 set (CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
 
-# SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 # add the automatically determined parts of the RPATH
 # which point to directories outside the build tree to the install RPATH
 set (CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -69,7 +68,7 @@ endforeach ()
 
 option (ENABLE_SHARED "Enable Shared Libraries" ON)
 
-if ( NABLE_SHARED)
+if (ENABLE_SHARED)
     set (DO_SHARED SHARED)
 else ()
     set (DO_SHARED STATIC)
@@ -79,7 +78,7 @@ include ( configure.cmake )
 
 # generated config files end up in binary dir so to find them, need
 # to add to include path
-include_directories ("${PROJECT_SOURCE_DIR}/include")
+include_directories (${RawToAces_INCLUDE_DIR})
 
 add_definitions (-DPACKAGE="${PROJECT_NAME}" -DVERSION="${RawToAces_VERSION}")
 add_subdirectory ("src/rawtoaces_idt")
@@ -88,55 +87,55 @@ add_subdirectory ("src/rawtoaces_util2")
 add_subdirectory ("src/rawtoaces")
 add_subdirectory ("src/rawtoaces2")
  
-# create a RawToAcesBuildTreeSettings.cmake file for the use from the build tree
-file (RELATIVE_PATH CONF_REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}" "${INSTALL_INCLUDE_DIR}")
-configure_file (config/RawToAcesBuildTreeSettings.cmake.in "${PROJECT_BINARY_DIR}/RawToAcesBuildTreeSettings.cmake" @ONLY)
-configure_file (config/RawToAcesConfig.cmake.in "${PROJECT_BINARY_DIR}/RawToAcesConfig.cmake" @ONLY)
-configure_file (config/RawToAcesConfigVersion.cmake.in "${PROJECT_BINARY_DIR}/RawToAcesConfigVersion.cmake" @ONLY)
+include(CMakePackageConfigHelpers)
 
 if (PKG_CONFIG_FOUND)
-    configure_file (config/RawToAces.pc.in "${PROJECT_BINARY_DIR}/RawToAces.pc" @ONLY)
-    install (FILES "${PROJECT_BINARY_DIR}/RawToAces.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig" COMPONENT dev
+   configure_file (config/RawToAces.pc.in "${PROJECT_BINARY_DIR}/RawToAces.pc" @ONLY)
+   install (FILES "${PROJECT_BINARY_DIR}/RawToAces.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig" COMPONENT dev)
+endif()
+
+
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake" "# Dummy file")
+
+write_basic_package_version_file(
+    "${PROJECT_NAME}ConfigVersion.cmake"
+    VERSION ${RawToAces_VERSION}
+    COMPATIBILITY SameMajorVersion
 )
-endif()
 
-install (FILES
-    "${PROJECT_BINARY_DIR}/RawToAcesConfig.cmake"
-    "${PROJECT_BINARY_DIR}/RawToAcesConfigVersion.cmake"
-    DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+configure_package_config_file(
+    config/${PROJECT_NAME}Config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
 
-if (WIN32 AND NOT CYGWIN)
-    install (FILES "${PROJECT_BINARY_DIR}/RawToAcesLibraryDepends.cmake" DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
-endif ()
+include (GNUInstallDirs)
+install(
+    TARGETS ${RawToAcesIdt_LIB} ${RawToAcesUtil_LIB} ${RawToAcesUtil2_LIB} ${RawToAces_BIN} ${RawToAces2_BIN}
+    EXPORT ${PROJECT_NAME}Targets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    PUBLIC_HEADER
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+)
 
-if (APPLE OR UNIX)
-	include (GNUInstallDirs)
-	install(
-        TARGETS ${RawToAcesIdt_LIB} ${RawToAcesUtil_LIB} ${RawToAcesUtil2_LIB} ${RawToAces_BIN} ${RawToAces2_BIN}
-        EXPORT RawToAcesConfig
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    )
-    export(
-        TARGETS ${RawToAcesIdt_LIB} ${RawToAcesUtil_LIB} ${RawToAcesUtil2_LIB} ${RawToAces_BIN} ${RawToAces2_BIN}
-        NAMESPACE ${PROJECT_NAME}::
-        FILE "${CMAKE_CURRENT_BINARY_DIR}/RawToAcesConfig.cmake"
-    )
-    install(
-        EXPORT ${PROJECT_NAME}Config
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/CMake/RawToAces"
-        NAMESPACE ${PROJECT_NAME}::
-    )
-    install (DIRECTORY data DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME})
-endif()
+install (
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake//${PROJECT_NAME}
+)
+
+install(
+    EXPORT ${PROJECT_NAME}Targets
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    FILE ${PROJECT_NAME}Targets.cmake
+    NAMESPACE ${PROJECT_NAME}::
+    EXPORT_LINK_INTERFACE_LIBRARIES
+)
+
+install (DIRECTORY data DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME})
 
 add_subdirectory (unittest)
-
-# uninstall target
-configure_file (
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-    IMMEDIATE @ONLY)
-
-add_custom_target(uninstall COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
