@@ -6,7 +6,7 @@
 
 #include <filesystem>
 
-using namespace rta;
+RAWTOACES_USING_NAMESPACE
 
 bool check_and_add(
     const std::filesystem::path &path, std::vector<std::string> &batch )

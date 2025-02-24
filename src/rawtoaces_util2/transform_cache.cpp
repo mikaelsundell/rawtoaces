@@ -7,8 +7,8 @@
 #include <rawtoaces/mathops.h>
 #include <rawtoaces/rta.h>
 
-namespace rta
-{
+RAWTOACES_NAMESPACE_BEGIN
+
 namespace cache
 {
 
@@ -300,4 +300,5 @@ template class cache::
     CacheBase<TransformDescriptor, TransformCacheEntryData, 5>;
 
 } // namespace cache
-} // namespace rta
+
+RAWTOACES_NAMESPACE_END

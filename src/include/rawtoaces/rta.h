@@ -52,8 +52,9 @@
 // THAN A.M.P.A.S., WHETHER DISCLOSED OR UNDISCLOSED.
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef _RTA_h__
-#define _RTA_h__
+#pragma once
+
+#include <rawtoaces/version.h>
 
 #include <string>
 #include <vector>
@@ -63,8 +64,8 @@
 
 using namespace std;
 
-namespace rta
-{
+RAWTOACES_NAMESPACE_BEGIN
+
 struct CIEXYZ
 {
     CIEXYZ(){};
@@ -268,5 +269,4 @@ struct Objfun
     const vector<vector<double>> _outLAB;
 };
 
-} // namespace rta
-#endif
+RAWTOACES_NAMESPACE_END

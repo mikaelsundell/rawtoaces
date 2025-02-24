@@ -60,8 +60,7 @@
 
 using namespace ceres;
 
-namespace rta
-{
+RAWTOACES_NAMESPACE_BEGIN
 
 Illum::Illum()
 {
@@ -1880,4 +1879,4 @@ template <typename T> bool Objfun::operator()( const T *B, T *residuals ) const
     return true;
 }
 
-} // namespace rta
+RAWTOACES_NAMESPACE_END

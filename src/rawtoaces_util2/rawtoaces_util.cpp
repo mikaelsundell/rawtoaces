@@ -16,8 +16,7 @@
 
 #include <filesystem>
 
-namespace rta
-{
+RAWTOACES_NAMESPACE_BEGIN
 
 cache::TransformCache transform_cache;
 
@@ -1081,4 +1080,4 @@ void ImageConverter::prepareIDT_nonDNG( const OIIO::ImageSpec &imageSpec )
     _CAT_matrix = getCAT( dIV, dOV );
 }
 
-} // namespace rta
+RAWTOACES_NAMESPACE_END

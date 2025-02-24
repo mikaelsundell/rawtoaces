@@ -18,6 +18,7 @@ set (RawToAcesUtil2_LIB "RawToAces_util2")
 set (RawToAces_BIN "rawtoaces")
 set (RawToAces2_BIN "rawtoaces2")
 
+set (RawToAces_NAMESPACE "rta")
 set (RawToAces_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/src/include")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
@@ -74,13 +75,23 @@ else ()
     set (DO_SHARED STATIC)
 endif ()
 
-include ( configure.cmake )
+include (configure.cmake)
+
+configure_file(
+    src/include/rawtoaces/version.h.in 
+    "${PROJECT_BINARY_DIR}/include/rawtoaces/version.h" 
+    @ONLY
+)
+include_directories("${PROJECT_BINARY_DIR}/include")
 
 # generated config files end up in binary dir so to find them, need
 # to add to include path
 include_directories (${RawToAces_INCLUDE_DIR})
 
-add_definitions (-DPACKAGE="${PROJECT_NAME}" -DVERSION="${RawToAces_VERSION}")
+add_definitions (
+    -DPACKAGE="${PROJECT_NAME}" 
+    -DVERSION="${RawToAces_VERSION}"
+)
 add_subdirectory ("src/rawtoaces_idt")
 add_subdirectory ("src/rawtoaces_util")
 add_subdirectory ("src/rawtoaces_util2")
@@ -93,7 +104,6 @@ if (PKG_CONFIG_FOUND)
    configure_file (config/RawToAces.pc.in "${PROJECT_BINARY_DIR}/RawToAces.pc" @ONLY)
    install (FILES "${PROJECT_BINARY_DIR}/RawToAces.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig" COMPONENT dev)
 endif()
-
 
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake" "# Dummy file")
 
@@ -119,6 +129,11 @@ install(
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     PUBLIC_HEADER
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+)
+
+install(
+    FILES "${PROJECT_BINARY_DIR}/include/rawtoaces/version.h"
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rawtoaces
 )
 
 install (

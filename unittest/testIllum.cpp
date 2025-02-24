@@ -63,7 +63,8 @@
 #include <rawtoaces/rta.h>
 
 using namespace std;
-using namespace rta;
+
+RAWTOACES_USING_NAMESPACE
 
 void testIllum_DefaultConstructor()
 {

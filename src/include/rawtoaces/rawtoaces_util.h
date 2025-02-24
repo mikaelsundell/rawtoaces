@@ -4,12 +4,12 @@
 
 #pragma once
 
+#include <rawtoaces/version.h>
 #include <OpenImageIO/argparse.h>
 #include <OpenImageIO/imageio.h>
 #include <OpenImageIO/imagebuf.h>
 
-namespace rta
-{
+RAWTOACES_NAMESPACE_BEGIN
 
 /// An image converter converts an image read from a camera raw image file
 /// into an ACESContainer compatible image.
@@ -205,4 +205,4 @@ private:
     std::vector<std::vector<double>> _CAT_matrix;
 };
 
-} // namespace rta
+RAWTOACES_NAMESPACE_END

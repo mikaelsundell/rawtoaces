@@ -52,10 +52,10 @@
 // THAN A.M.P.A.S., WHETHER DISCLOSED OR UNDISCLOSED.
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef _MATHOPS_h__
-#define _MATHOPS_h__
+#pragma once
 
-#include "define.h"
+#include <rawtoaces/version.h>
+#include <rawtoaces/define.h>
 
 #include <cfloat>
 
@@ -642,5 +642,3 @@ vector<vector<T>> getCalcXYZt( const vector<vector<T>> &RGB, const T B[6] )
 
     return outCalcXYZt;
 };
-
-#endif
