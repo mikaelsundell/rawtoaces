@@ -40,8 +40,8 @@ int main( int argc, const char *argv[] )
 
     ImageConverter converter;
     converter.init_parser( argParse );
-    
-    if (argc == 1)
+
+    if ( argc == 1 )
     {
         argParse.print_help();
         return EXIT_FAILURE;
