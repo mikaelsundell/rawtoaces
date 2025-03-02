@@ -215,8 +215,8 @@ template <typename T> T sumVector( const vector<T> &vct )
 
 template <typename T> T sumVectorM( const vector<vector<T>> &vct )
 {
-    int row = vct.size();
-    int col = vct[0].size();
+    auto row = vct.size();
+    auto col = vct[0].size();
 
     T                                   sum = T( 0 );
     Eigen::Matrix<T, Eigen::Dynamic, 1> v;

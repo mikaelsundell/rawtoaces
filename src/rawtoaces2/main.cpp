@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // https://github.com/AcademySoftwareFoundation/rawtoaces
 
-#include <rawtoaces/rawtoaces_util.h>
+#include <rawtoaces/image_converter.h>
 
 #include <filesystem>
 
@@ -40,15 +40,31 @@ int main( int argc, const char *argv[] )
 
     ImageConverter converter;
     converter.init_parser( argParse );
+    
+    if (argc == 1)
+    {
+        argParse.print_help();
+        return EXIT_FAILURE;
+    }
 
     if ( argParse.parse_args( argc, argv ) < 0 )
     {
         return 1;
     }
 
+    if ( converter.parse_list_cameras( argParse ) )
+    {
+        return EXIT_SUCCESS;
+    }
+
+    if ( converter.parse_list_illuminants( argParse ) )
+    {
+        return EXIT_SUCCESS;
+    }
+
     if ( !converter.parse_params( argParse ) )
     {
-        return 1;
+        return EXIT_FAILURE;
     }
 
     // Create a separate batch for each input directory.
@@ -62,7 +78,7 @@ int main( int argc, const char *argv[] )
         {
             std::cerr << "File or directory not found: " << filename
                       << std::endl;
-            return 1;
+            return EXIT_FAILURE;
         }
 
         auto canonical_filename = std::filesystem::canonical( filename );
@@ -151,5 +167,5 @@ int main( int argc, const char *argv[] )
         }
     }
 
-    return result ? 0 : 1;
+    return result ? EXIT_SUCCESS : EXIT_FAILURE;
 }

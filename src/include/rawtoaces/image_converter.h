@@ -108,6 +108,28 @@ public:
     ///    `true` if parsed successfully
     bool parse_params( const OIIO::ArgParse &argParse );
 
+    /// Prints a list of available cameras with spectral sensitivity data.
+    /// This function checks if the `--list-cameras` argument is provided.
+    /// If so, it scans the available camera data files, loads their spectral
+    /// sensitivity information, and prints the supported camera models.
+    /// @param argParse
+    ///    the command line parser object
+    /// @result
+    ///    `true` if the `--list-cameras` argument was found and processed,
+    ///    `false` otherwise
+    bool parse_list_cameras( const OIIO::ArgParse &argParse );
+    
+    /// Prints a list of supported illuminants.
+    /// This function checks if the `--list-illuminants` argument is provided.
+    /// If so, it scans the available illuminant data files, loads their spectral
+    /// data, and prints the supported illuminant types.
+    /// @param argParse
+    ///    the command line parser object
+    /// @result
+    ///    `true` if the `--list-illuminants` argument was found and processed,
+    ///    `false` otherwise
+    bool parse_list_illuminants( const OIIO::ArgParse &argParse );
+
     /// Configures the converter using the requested white balance and colour
     /// matrix method, and the metadata of the file provided in `input_file`.
     /// This method loads the metadata from the given image file and

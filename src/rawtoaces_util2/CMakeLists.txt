@@ -7,8 +7,8 @@ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}")
 add_library (${RawToAcesUtil2_LIB} ${DO_SHARED}
     transform_cache.cpp
     transform_cache.h
-    rawtoaces_util.cpp
-    ${RawToAces_INCLUDE_DIR}/rawtoaces/rawtoaces_util.h
+    image_converter.cpp
+    ${RawToAces_INCLUDE_DIR}/rawtoaces/image_converter.h
     ${RawToAces_INCLUDE_DIR}/rawtoaces/cache_base.h
 )
 
@@ -39,7 +39,7 @@ set_target_properties(
 
 install(
     FILES
-         ${RawToAces_INCLUDE_DIR}/rawtoaces/rawtoaces_util.h
+         ${RawToAces_INCLUDE_DIR}/rawtoaces/image_converter.h
          ${RawToAces_INCLUDE_DIR}/rawtoaces/cache_base.h	 	
     DESTINATION include/${PROJECT_NAME}
 )
