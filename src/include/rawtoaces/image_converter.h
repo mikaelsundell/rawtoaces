@@ -118,7 +118,7 @@ public:
     ///    `true` if the `--list-cameras` argument was found and processed,
     ///    `false` otherwise
     bool parse_list_cameras( const OIIO::ArgParse &argParse );
-    
+
     /// Prints a list of supported illuminants.
     /// This function checks if the `--list-illuminants` argument is provided.
     /// If so, it scans the available illuminant data files, loads their spectral

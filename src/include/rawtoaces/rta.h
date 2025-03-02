@@ -161,7 +161,10 @@ public:
     char *getModel();
 
     int getWLIncrement();
-    int loadSpst( const string &path, const char *maker = nullptr, const char *model = nullptr );
+    int loadSpst(
+        const string &path,
+        const char   *maker = nullptr,
+        const char   *model = nullptr );
 
     vector<RGBSen> getSensitivity();
 
@@ -169,7 +172,7 @@ private:
     char          *_brand;
     char          *_model;
     int            _increment;
-    long            _spstMaxCol;
+    long           _spstMaxCol;
     vector<RGBSen> _rgbsen;
 };
 
