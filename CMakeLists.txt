@@ -31,17 +31,6 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${warnings}")
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${warnings}")
 set (CMAKE_DEBUG_POSTFIX "_d" )
 
-# make install directories overridable
-set (INSTALL_LIB_DIR lib CACHE PATH "Install directory for libraries")
-set (INSTALL_BIN_DIR bin CACHE PATH "Install directory for executable binaries")
-set (INSTALL_INCLUDE_DIR include CACHE PATH "Install directory for public header files")
-if (WIN32 AND NOT CYGWIN )
-    set (DEF_INSTALL_CMAKE_DIR cmake)
-else ()
-    set (DEF_INSTALL_CMAKE_DIR lib/cmake/${PROJECT_NAME})
-endif ()
-set (INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Install directory for project CMake files")
-
 # use, i.e. don't skip the full RPATH for the build tree
 set (CMAKE_SKIP_BUILD_RPATH FALSE)
 
@@ -102,7 +91,7 @@ include(CMakePackageConfigHelpers)
 
 if (PKG_CONFIG_FOUND)
    configure_file (config/RawToAces.pc.in "${PROJECT_BINARY_DIR}/RawToAces.pc" @ONLY)
-   install (FILES "${PROJECT_BINARY_DIR}/RawToAces.pc" DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig" COMPONENT dev)
+   install (FILES "${PROJECT_BINARY_DIR}/RawToAces.pc" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig COMPONENT dev)
 endif()
 
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake" "# Dummy file")
