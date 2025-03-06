@@ -45,7 +45,7 @@ set_target_properties(
        
 install(FILES
     ${RawToAces_INCLUDE_DIR}/rawtoaces/acesrender.h	 	
- 	DESTINATION include/${PROJECT_NAME}
+ 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
 )
 
-install (TARGETS ${RAWTOACESLIB} DESTINATION lib)
+install (TARGETS ${RAWTOACESLIB} DESTINATION ${CMAKE_INSTALL_LIBDIR})

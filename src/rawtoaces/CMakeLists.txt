@@ -21,4 +21,4 @@ else ()
     target_link_libraries (${RawToAces_BIN} PUBLIC ${libraw_LIBRARIES} ${libraw_LDFLAGS_OTHER})
 endif ()
 
-install (TARGETS ${RawToAces_BIN} DESTINATION bin )
+install (TARGETS ${RawToAces_BIN} DESTINATION ${CMAKE_INSTALL_BINDIR} )

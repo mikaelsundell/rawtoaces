@@ -5,7 +5,6 @@
 cmake_minimum_required (VERSION 3.10)
 project (RawToAces)
 
-
 set (RawToAces_MAJOR_VERSION 2)
 set (RawToAces_MINOR_VERSION 0)
 set (RawToAces_PATCH_VERSION 1)
@@ -73,9 +72,10 @@ configure_file(
 )
 include_directories("${PROJECT_BINARY_DIR}/include")
 
-# generated config files end up in binary dir so to find them, need
-# to add to include path
+# generated config files end up in binary dir so to find them, need to add to include path
 include_directories (${RawToAces_INCLUDE_DIR})
+
+include (GNUInstallDirs)
 
 add_definitions (
     -DPACKAGE="${PROJECT_NAME}" 
@@ -108,7 +108,7 @@ configure_package_config_file(
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
-include (GNUInstallDirs)
+
 install(
     TARGETS ${RawToAcesIdt_LIB} ${RawToAcesUtil_LIB} ${RawToAcesUtil2_LIB} ${RawToAces_BIN} ${RawToAces2_BIN}
     EXPORT ${PROJECT_NAME}Targets

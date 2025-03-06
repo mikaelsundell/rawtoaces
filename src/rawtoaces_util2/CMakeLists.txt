@@ -41,7 +41,7 @@ install(
     FILES
          ${RawToAces_INCLUDE_DIR}/rawtoaces/image_converter.h
          ${RawToAces_INCLUDE_DIR}/rawtoaces/cache_base.h	 	
-    DESTINATION include/${PROJECT_NAME}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
 )
 
-install (TARGETS ${RawToAcesUtil2_LIB} DESTINATION lib)
+install (TARGETS ${RawToAcesUtil2_LIB} DESTINATION ${CMAKE_INSTALL_LIBDIR})

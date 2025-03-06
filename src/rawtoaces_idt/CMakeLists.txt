@@ -43,7 +43,7 @@ install (FILES
     ${RawToAces_INCLUDE_DIR}/rawtoaces/mathops.h
     ${RawToAces_INCLUDE_DIR}/rawtoaces/rta.h
     ${RawToAces_INCLUDE_DIR}/rawtoaces/metadata.h
-    DESTINATION include/rawtoaces
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rawtoaces
 )
 
-install (TARGETS ${RawToAcesIdt_LIB} DESTINATION lib)
+install (TARGETS ${RawToAcesIdt_LIB} DESTINATION ${CMAKE_INSTALL_LIBDIR})
