@@ -8,7 +8,6 @@ set_target_properties(${RAWTOACESIDTLIB} PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES ""
 )
 
-
 target_sources(${RAWTOACESIDTLIB} PRIVATE
     ${PROJECT_SOURCE_DIR}/include/rawtoaces/acesrender.h
 )
@@ -33,7 +32,8 @@ target_link_libraries(${RAWTOACESLIB}
         Imath::ImathConfig
 )
 
-if (AcesContainer_FOUND)
+if (AcesContainer_FOUND AND (TARGET AcesContainer::AcesContainer OR AcesContainer_LIBRARIES))
+    message(STATUS "Linking AcesContainer to ${RAWTOACESLIB}")
     if (TARGET AcesContainer::AcesContainer)
         target_link_libraries(${RAWTOACESLIB} PRIVATE AcesContainer::AcesContainer)
     else()
@@ -41,6 +41,8 @@ if (AcesContainer_FOUND)
         target_link_directories(${RAWTOACESLIB} PRIVATE ${AcesContainer_LIBRARY_DIRS})
         target_link_libraries(${RAWTOACESLIB} PRIVATE ${AcesContainer_LIBRARIES})
     endif()
+else()
+    message(STATUS "AcesContainer not found. Skipping linkage.")
 endif()
 
 if (TARGET LibRaw::LibRaw)
