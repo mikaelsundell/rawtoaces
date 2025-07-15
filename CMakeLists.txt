@@ -56,14 +56,14 @@ foreach( p LIB BIN INCLUDE CMAKE )
   endif()
 endforeach()
 
-#option( ENABLE_SHARED "Enable Shared Libraries" ON )
+option( ENABLE_SHARED "Enable Shared Libraries" ON )
 option( RTA_CENTOS7_CERES_HACK "Work around broken config in ceres-solver 1.12" OFF )
 
-#if ( ENABLE_SHARED )
+if ( ENABLE_SHARED )
 set ( DO_SHARED SHARED )
-#else ()
-# set ( DO_SHARED STATIC )
-#endif ()
+else ()
+set ( DO_SHARED STATIC )
+endif ()
 
 include ( configure.cmake )
 
@@ -96,13 +96,6 @@ target_link_libraries(rawtoaces
         Boost::filesystem
         Boost::system
 )
-
-if ( LIBRAW_CONFIG_FOUND )
-    target_link_libraries ( rawtoaces PUBLIC libraw::raw )
-else ()
-    target_link_directories(rawtoaces PUBLIC ${LibRaw_LIBRARY_DIRS} )
-    target_link_libraries(rawtoaces PUBLIC ${LibRaw_LIBRARIES} ${LibRaw_LDFLAGS_OTHER} )
-endif ()
 
 enable_testing()
 add_subdirectory(unittest)

@@ -42,7 +42,7 @@ if(LibRaw_INCLUDE_DIR AND EXISTS "${LibRaw_INCLUDE_DIR}/libraw_version.h")
 endif()
 
 find_library(LibRaw_LIBRARY
-    NAMES raw libraw
+    NAMES raw rawd libraw
     HINTS ${_LibRaw_HINT_LIB}
 )
 

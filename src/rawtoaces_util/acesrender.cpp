@@ -11,6 +11,8 @@
 
 #include <aces/aces_Writer.h>
 
+#include <mutex>
+
 #ifndef WIN32
 #    include <fcntl.h>
 #    include <sys/mman.h>

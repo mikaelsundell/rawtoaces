@@ -25,7 +25,7 @@ target_link_libraries(${RAWTOACESLIB}
 )
 
 target_link_libraries(${RAWTOACESLIB}
-    PRIVATE
+    PUBLIC
         Boost::filesystem
         Boost::system
         Imath::Imath
@@ -35,11 +35,11 @@ target_link_libraries(${RAWTOACESLIB}
 if (AcesContainer_FOUND AND (TARGET AcesContainer::AcesContainer OR AcesContainer_LIBRARIES))
     message(STATUS "Linking AcesContainer to ${RAWTOACESLIB}")
     if (TARGET AcesContainer::AcesContainer)
-        target_link_libraries(${RAWTOACESLIB} PRIVATE AcesContainer::AcesContainer)
+        target_link_libraries(${RAWTOACESLIB} PUBLIC AcesContainer::AcesContainer)
     else()
-        target_include_directories(${RAWTOACESLIB} PRIVATE ${AcesContainer_INCLUDE_DIRS})
-        target_link_directories(${RAWTOACESLIB} PRIVATE ${AcesContainer_LIBRARY_DIRS})
-        target_link_libraries(${RAWTOACESLIB} PRIVATE ${AcesContainer_LIBRARIES})
+        target_include_directories(${RAWTOACESLIB} PUBLIC ${AcesContainer_INCLUDE_DIRS})
+        target_link_directories(${RAWTOACESLIB} PUBLIC ${AcesContainer_LIBRARY_DIRS})
+        target_link_libraries(${RAWTOACESLIB} PUBLIC ${AcesContainer_LIBRARIES})
     endif()
 else()
     message(STATUS "AcesContainer not found. Skipping linkage.")
