@@ -4,11 +4,11 @@ add_library ( ${RAWTOACESLIB} ${DO_SHARED}
     acesrender.cpp
 )
 
-set_target_properties(${RAWTOACESIDTLIB} PROPERTIES
+set_target_properties(${RAWTOACESLIB} PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES ""
 )
 
-target_sources(${RAWTOACESIDTLIB} PRIVATE
+target_sources(${RAWTOACESLIB} PRIVATE
     ${PROJECT_SOURCE_DIR}/include/rawtoaces/acesrender.h
 )
 
