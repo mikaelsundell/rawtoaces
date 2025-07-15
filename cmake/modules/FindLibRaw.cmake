@@ -15,13 +15,11 @@ if(PKG_CONFIG_FOUND)
     pkg_check_modules(PC_LibRaw QUIET libraw)
 endif()
 
-# Brew special handling for macOS
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND PC_LibRaw_FOUND AND "${PC_LibRaw_INCLUDEDIR}" MATCHES ".*/Cellar/.*")
     set(_LibRaw_HINT_INCLUDE /usr/local/include)
     set(_LibRaw_HINT_LIB /usr/local/lib)
 endif()
 
-# Hints from pkg-config
 if(PC_LibRaw_FOUND)
     set(LibRaw_CFLAGS ${PC_LibRaw_CFLAGS_OTHER})
     set(LibRaw_LIBRARY_DIRS ${PC_LibRaw_LIBRARY_DIRS})
@@ -32,7 +30,6 @@ if(PC_LibRaw_FOUND)
     endif()
 endif()
 
-# Locate header
 find_path(LibRaw_INCLUDE_DIR libraw/libraw.h
     HINTS ${_LibRaw_HINT_INCLUDE}
 )
@@ -44,20 +41,17 @@ if(LibRaw_INCLUDE_DIR AND EXISTS "${LibRaw_INCLUDE_DIR}/libraw_version.h")
            "\\1" LibRaw_VERSION "${libraw_version_str}")
 endif()
 
-# Locate library
 find_library(LibRaw_LIBRARY
     NAMES raw libraw
     HINTS ${_LibRaw_HINT_LIB}
 )
 
-# Handle required variables
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(LibRaw
     REQUIRED_VARS LibRaw_LIBRARY LibRaw_INCLUDE_DIR
     VERSION_VAR LibRaw_VERSION
 )
 
-# Set include and libs
 if(LibRaw_FOUND)
     set(LibRaw_INCLUDE_DIRS ${LibRaw_INCLUDE_DIR})
     set(LibRaw_LIBRARIES ${LibRaw_LIBRARY})

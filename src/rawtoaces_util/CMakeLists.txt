@@ -27,9 +27,9 @@ target_link_libraries(${RAWTOACESLIB}
 )
 
 if (AcesContainer_FOUND)
-    target_include_directories(${RAWTOACESLIB} PRIVATE ${AcesContainer_INCLUDE_DIRS})
-    target_link_directories(${RAWTOACESLIB} PRIVATE ${AcesContainer_LIBRARY_DIRS})
-    target_link_libraries(${RAWTOACESLIB} PRIVATE ${AcesContainer_LIBRARIES})
+    target_include_directories(${RAWTOACESLIB} PUBLIC ${AcesContainer_INCLUDE_DIRS})
+    target_link_directories(${RAWTOACESLIB} PUBLIC ${AcesContainer_LIBRARY_DIRS})
+    target_link_libraries(${RAWTOACESLIB} PUBLIC ${AcesContainer_LIBRARIES})
 endif()
 
 if (TARGET LibRaw::LibRaw)
