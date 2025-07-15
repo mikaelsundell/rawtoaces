@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.5)
 
 add_library(${RAWTOACESIDTLIB} ${DO_SHARED}
     rta.cpp
-    ../../include/rawtoaces/define.h
-    ../../include/rawtoaces/mathOps.h
-    ../../include/rawtoaces/rta.h
 )
 
 target_include_directories(${RAWTOACESIDTLIB}

@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.5)
 
 add_library ( ${RAWTOACESLIB} ${DO_SHARED}
     acesrender.cpp
-    ../../include/rawtoaces/acesrender.h
 )
 
 target_include_directories(${RAWTOACESLIB}
