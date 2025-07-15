@@ -3,22 +3,48 @@ include_directories( "${CMAKE_CURRENT_SOURCE_DIR}" )
 
 add_library( ${RAWTOACESIDTLIB} ${DO_SHARED}
     rta.cpp
-
-    # Make the headers visible in IDEs. This should not affect the builds.
     ../../include/rawtoaces/define.h
     ../../include/rawtoaces/mathOps.h
     ../../include/rawtoaces/rta.h
 )
 
+target_include_directories(${RAWTOACESIDTLIB}
+    PUBLIC
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
+
 target_link_libraries(
     ${RAWTOACESIDTLIB}
     PUBLIC
-        Boost::boost
-        Boost::system
+	    Eigen3::Eigen
+)
+
+target_link_libraries(${RAWTOACESIDTLIB}
+    PRIVATE
+        Eigen3::Eigen
         Boost::filesystem
+        Boost::system
+)
+
+if (TARGET libraw::raw)
+    target_link_libraries(${RAWTOACESIDTLIB} PUBLIC libraw::raw)
+else()
+    if (libraw_INCLUDE_DIRS)
+        target_include_directories(${RAWTOACESIDTLIB} PUBLIC ${LibRaw_INCLUDE_DIRS})
+    endif()
+    if (libraw_LIBRARY_DIRS)
+        target_link_directories(${RAWTOACESIDTLIB} PRIVATE ${LibRaw_LIBRARY_DIRS})
+    endif()
+    if (libraw_LIBRARIES)
+        target_link_libraries(${RAWTOACESIDTLIB} PUBLIC ${LibRaw_LIBRARIES} ${LibRaw_LDFLAGS_OTHER})
+    endif()
+endif()
+
+target_link_libraries(${RAWTOACESIDTLIB}
+    PRIVATE
         Imath::Imath
         Imath::ImathConfig
-	Eigen3::Eigen
 )
 
 if ( ${Ceres_VERSION_MAJOR} GREATER 1 )
@@ -28,18 +54,22 @@ else ()
     target_link_libraries(${RAWTOACESIDTLIB} PUBLIC ${CERES_LIBRARIES})
 endif ()
 
-
-set_target_properties( ${RAWTOACESIDTLIB} PROPERTIES
-    SOVERSION ${RAWTOACES_MAJOR_VERSION}.${RAWTOACES_MINOR_VERSION}.${RAWTOACES_PATCH_VERSION}
-    VERSION ${RAWTOACES_VERSION}
-)
-
-install(FILES
+set(RAWTOACESIDT_HEADERS
     ${PROJECT_SOURCE_DIR}/include/rawtoaces/define.h
     ${PROJECT_SOURCE_DIR}/include/rawtoaces/mathOps.h
     ${PROJECT_SOURCE_DIR}/include/rawtoaces/rta.h
-
- 	DESTINATION include/rawtoaces
 )
 
-install( TARGETS ${RAWTOACESIDTLIB} DESTINATION lib )
+set_target_properties(${RAWTOACESIDTLIB} PROPERTIES
+    SOVERSION ${RAWTOACES_MAJOR_VERSION}.${RAWTOACES_MINOR_VERSION}.${RAWTOACES_PATCH_VERSION}
+    VERSION ${RAWTOACES_VERSION}
+    PUBLIC_HEADER "${RAWTOACESIDT_HEADERS}"
+)
+
+install(TARGETS ${RAWTOACESIDTLIB}
+    EXPORT ${PROJECT_NAME}Targets
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/rawtoaces
+)

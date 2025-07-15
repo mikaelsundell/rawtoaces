@@ -85,23 +85,23 @@ add_executable( rawtoaces
     main.cpp
 )
 
-target_include_directories( rawtoaces
-    PUBLIC
+target_include_directories(rawtoaces
+    PRIVATE
         ${AcesContainer_INCLUDE_DIRS}
 )
 
-target_link_libraries ( rawtoaces
-    PUBLIC
+target_link_libraries(rawtoaces
+    PRIVATE
         ${RAWTOACESLIB}
-    INTERFACE
-        Boost::headers
+        Boost::filesystem
+        Boost::system
 )
 
 if ( LIBRAW_CONFIG_FOUND )
     target_link_libraries ( rawtoaces PUBLIC libraw::raw )
 else ()
-    target_link_directories(rawtoaces PUBLIC ${libraw_LIBRARY_DIRS} )
-    target_link_libraries(rawtoaces PUBLIC ${libraw_LIBRARIES} ${libraw_LDFLAGS_OTHER} )
+    target_link_directories(rawtoaces PUBLIC ${LibRaw_LIBRARY_DIRS} )
+    target_link_libraries(rawtoaces PUBLIC ${LibRaw_LIBRARIES} ${LibRaw_LDFLAGS_OTHER} )
 endif ()
 
 enable_testing()
@@ -131,15 +131,8 @@ configure_package_config_file(
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
 )
 
-install(
-    TARGETS ${RAWTOACESIDTLIB} ${RAWTOACESLIB}
-    EXPORT ${PROJECT_NAME}Targets
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    PUBLIC_HEADER
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
+install(FILES cmake/modules/FindLibRaw.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/modules
 )
 
 install (

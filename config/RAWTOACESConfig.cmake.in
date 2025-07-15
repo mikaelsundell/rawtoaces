@@ -1,11 +1,17 @@
 @PACKAGE_INIT@
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/modules")
+
 # Find dependencies required by RawToAces
 include ( CMakeFindDependencyMacro )
-find_dependency( Boost REQUIRED COMPONENTS headers system filesystem )
-find_dependency( Imath REQUIRED )
+find_dependency( Boost REQUIRED COMPONENTS filesystem system )
 find_dependency( Eigen3 REQUIRED )
 find_dependency( Ceres REQUIRED )
+
+find_package(LibRaw CONFIG QUIET)
+if(NOT LibRaw_FOUND)
+    find_package(LibRaw MODULE REQUIRED)
+endif()
 
 include( "${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake" )
 check_required_components( "@PROJECT_NAME@" )
