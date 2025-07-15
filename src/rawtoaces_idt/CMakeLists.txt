@@ -9,8 +9,8 @@ add_library(${RAWTOACESIDTLIB} ${DO_SHARED}
 
 target_include_directories(${RAWTOACESIDTLIB}
     PUBLIC
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 target_link_libraries(${RAWTOACESIDTLIB}
