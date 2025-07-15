@@ -31,9 +31,7 @@ if (TARGET LibRaw::LibRaw)
     target_link_libraries(${RAWTOACESIDTLIB} PUBLIC LibRaw::LibRaw)
 else()
     if (LibRaw_INCLUDE_DIRS)
-        target_include_directories(${RAWTOACESIDTLIB}
-            PUBLIC $<BUILD_INTERFACE:${LibRaw_INCLUDE_DIRS}>
-        )
+        target_include_directories(${RAWTOACESIDTLIB} PUBLIC ${LibRaw_INCLUDE_DIRS})
     endif()
     if (LibRaw_LIBRARY_DIRS)
         target_link_directories(${RAWTOACESIDTLIB} PRIVATE ${LibRaw_LIBRARY_DIRS})
