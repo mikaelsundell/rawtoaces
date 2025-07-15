@@ -4,6 +4,15 @@ add_library ( ${RAWTOACESLIB} ${DO_SHARED}
     acesrender.cpp
 )
 
+set_target_properties(${RAWTOACESIDTLIB} PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES ""
+)
+
+
+target_sources(${RAWTOACESIDTLIB} PRIVATE
+    ${PROJECT_SOURCE_DIR}/include/rawtoaces/acesrender.h
+)
+
 target_include_directories(${RAWTOACESLIB}
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../include>

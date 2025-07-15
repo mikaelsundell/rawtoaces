@@ -4,6 +4,16 @@ add_library(${RAWTOACESIDTLIB} ${DO_SHARED}
     rta.cpp
 )
 
+set_target_properties(${RAWTOACESIDTLIB} PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES ""
+)
+
+target_sources(${RAWTOACESIDTLIB} PRIVATE
+    ${PROJECT_SOURCE_DIR}/include/rawtoaces/define.h
+    ${PROJECT_SOURCE_DIR}/include/rawtoaces/mathOps.h
+    ${PROJECT_SOURCE_DIR}/include/rawtoaces/rta.h
+)
+
 target_include_directories(${RAWTOACESIDTLIB}
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../include>
