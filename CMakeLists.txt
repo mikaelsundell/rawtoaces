@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.11)
 project( RAWTOACES )
 
 set( RAWTOACES_MAJOR_VERSION 1 )
@@ -92,8 +92,34 @@ endif()
 ##
 ##   Install data
 
+###############################################################################
+##
+##  Fetch data files from rawtoaces-data
+##
+include(FetchContent)
+
+FetchContent_Declare(
+  rawtoaces_data
+  GIT_REPOSITORY https://github.com/AcademySoftwareFoundation/rawtoaces-data
+  GIT_TAG 4db0acc872965ecdbbf578664be20abf17c18e8c # v0.1.0
+)
+
+FetchContent_MakeAvailable(rawtoaces_data)
+
+###############################################################################
+
 if ( APPLE OR UNIX )
-	install (DIRECTORY data DESTINATION include/rawtoaces)
+    install (
+        DIRECTORY
+            ${PROJECT_BINARY_DIR}/_deps/rawtoaces_data-src/data
+        DESTINATION include/rawtoaces
+    )
+    
+    install (
+        FILES
+            ${PROJECT_BINARY_DIR}/_deps/rawtoaces_data-src/LICENSE
+        DESTINATION include/rawtoaces/data
+    )
 endif()
 
 
