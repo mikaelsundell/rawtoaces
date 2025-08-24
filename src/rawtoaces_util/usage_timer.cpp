@@ -34,12 +34,13 @@ void UsageTimer::reset()
         _start_time =
             (double)start_timeval.QuadPart * 1000.0 / (double)unit.QuadPart;
 #endif
+        _initialized = true;
     }
 }
 
 void UsageTimer::print( const std::string &path, const std::string &message )
 {
-    if ( enabled )
+    if ( enabled && _initialized )
     {
 #ifndef WIN32
         struct timeval end_timeval;
@@ -54,9 +55,10 @@ void UsageTimer::print( const std::string &path, const std::string &message )
             (double)end_timeval.QuadPart * 1000.0 / (double)unit.QuadPart;
 #endif
 
+        double diff_msec = end_time - _start_time;
+
         std::cerr << "Timing: " << path << "/" << message << ": " << std::fixed
-                  << std::setprecision( 3 ) << end_time - _start_time
-                  << std::defaultfloat
+                  << std::setprecision( 3 ) << diff_msec << std::defaultfloat
                   << std::setprecision( (int)std::cout.precision() ) << "msec"
                   << std::endl;
     }

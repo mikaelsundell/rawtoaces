@@ -27,7 +27,8 @@ public:
     void print( const std::string &path, const std::string &message );
 
 private:
-    double _start_time;
+    double _start_time  = 0.0;
+    bool   _initialized = false;
 };
 
 } //namespace util
