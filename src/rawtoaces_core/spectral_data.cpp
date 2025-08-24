@@ -196,7 +196,7 @@ bool SpectralData::load( const std::string &path, bool reshape )
 
     try
     {
-        std::ifstream  i( path );
+        std::ifstream i( path );
         if ( !i.is_open() )
         {
             std::cerr << "Error: Failed to open file " << path << "."
