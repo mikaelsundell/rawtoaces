@@ -11,8 +11,6 @@ namespace rta
 namespace util
 {
 
-void create_key( std::unordered_map<std::string, char> &keys );
-
 /// Collect all files from a given`path` into batchs. If the `path` is a
 /// directory, create an entry in `batches` and fill it with the file names
 /// from that directory. If the `path` is a file, add its name to the first
@@ -27,18 +25,6 @@ bool collect_image_files(
 class ImageConverter
 {
 public:
-    // TODO:
-    // Removed options comparing to v1.1:
-    // -P - bad pixels
-    // -K - dark frame
-    // -j - fuji-rotate
-    // -m - median filter
-    // -f - four-colour RGB
-    // -T - print Libraw-supported cameras
-    // -F - use big file
-    // -E - mmap-ed IO
-    // -s - image index in the file
-    // -G - green_matching() filter
     struct Settings
     {
         /// The  white balancing method to use for conversion can be specified
@@ -92,7 +78,7 @@ public:
             Soft,
             /// Write out only the crop area.
             Hard
-        } crop_mode = CropMode::Soft;
+        } crop_mode = CropMode::Hard;
 
         /// An illuminant to use for white balancing and/or colour matrix
         /// calculation. Only used when `wbMethod` ==
@@ -136,8 +122,6 @@ public:
         int  verbosity  = 0;
 
     } settings;
-
-    static void usage( const char *prog );
 
     /// Initialise the parser object with all the command line parameters
     /// used by this tool. The method also sets the help and usage strings.
