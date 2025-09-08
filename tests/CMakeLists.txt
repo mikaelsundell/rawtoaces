@@ -18,35 +18,35 @@ endif()
 ################################################################################
 
 add_executable (
-	Test_usage_example_core
-	usage_example_core.cpp
+	Test_core_usage
+	core_usage.cpp
 )
 
 target_link_libraries(
-    Test_usage_example_core
+    Test_core_usage
     PUBLIC
         ${RAWTOACES_CORE_LIB}
         OpenImageIO::OpenImageIO
 )
 
-setup_test_coverage(Test_usage_example_core)
-add_test ( NAME Test_usage_example_core COMMAND Test_usage_example_core )
+setup_test_coverage(Test_core_usage)
+add_test ( NAME Test_core_usage COMMAND Test_core_usage )
 
 ################################################################################
 add_executable (
-	Test_usage_example_util
-	usage_example_util.cpp
+	Test_util_usage
+	util_usage.cpp
 )
 
 target_link_libraries(
-    Test_usage_example_util
+    Test_util_usage
     PUBLIC
         ${RAWTOACES_UTIL_LIB}
         OpenImageIO::OpenImageIO
 )
 
-setup_test_coverage(Test_usage_example_util)
-add_test ( NAME Test_usage_example_util COMMAND Test_usage_example_util )
+setup_test_coverage(Test_util_usage)
+add_test ( NAME Test_util_usage COMMAND Test_util_usage )
 
 ################################################################################
 add_executable (
@@ -183,22 +183,7 @@ target_link_libraries(
 setup_test_coverage(Test_UsageTimer)
 add_test ( NAME Test_UsageTimer COMMAND Test_UsageTimer )
 
-################################################################################
 
-add_executable (
-	Test_ImageConverter
-	test_image_converter.cpp
-)
-
-target_link_libraries(
-    Test_ImageConverter
-    PUBLIC
-        ${RAWTOACES_UTIL_LIB}
-        OpenImageIO::OpenImageIO
-)
-
-setup_test_coverage(Test_ImageConverter)
-add_test ( NAME Test_ImageConverter COMMAND Test_ImageConverter )
 
 ################################################################################
 # Coverage report generation
