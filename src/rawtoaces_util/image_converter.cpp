@@ -544,6 +544,11 @@ provided using the -"custom-wb" parameter.
 
 Rawtoaces supports the following methods of color matrix 
 computation:
+- "auto" (recommended) first tries the "spectral" method if 
+spectral sensitivity data for the camera is available. If not, 
+it falls back to "metadata". This avoids failures when spectral 
+data is missing while still using the most accurate method 
+when possible.
 - "spectral" uses the camera sensor's spectral sensitivity data 
 to compute the optimal matrix. This mode requires spectral 
 sensitivity data for the camera model the image comes from. 
@@ -675,10 +680,10 @@ void ImageConverter::init_parser( OIIO::ArgParse &arg_parser )
 
     arg_parser.arg( "--mat-method" )
         .help(
-            "IDT matrix calculation method. Supported options: spectral, "
+            "IDT matrix calculation method. Supported options: auto, spectral, "
             "metadata, Adobe, custom." )
         .metavar( "STR" )
-        .defaultval( "spectral" )
+        .defaultval( "auto" )
         .action( OIIO::ArgParse::store() );
 
     arg_parser.arg( "--illuminant" )
@@ -741,6 +746,14 @@ void ImageConverter::init_parser( OIIO::ArgParse &arg_parser )
             "Allows overwriting existing files. If not set, trying to write "
             "to an existing file will generate an error." )
         .action( OIIO::ArgParse::store_true() );
+
+    arg_parser.arg( "--data-dir" )
+        .help(
+            "Directory containing rawtoaces spectral sensitivity and illuminant "
+            "data files. Overrides the default search path and the "
+            "RAWTOACES_DATA_PATH environment variable." )
+        .metavar( "STR" )
+        .action( OIIO::ArgParse::store() );
 
     arg_parser.arg( "--output-dir" )
         .help(
@@ -869,7 +882,15 @@ void ImageConverter::init_parser( OIIO::ArgParse &arg_parser )
 
 bool ImageConverter::parse_parameters( const OIIO::ArgParse &arg_parser )
 {
-    settings.database_directories = database_paths();
+    std::string data_dir = arg_parser["data-dir"].get();
+    if ( data_dir.size() )
+    {
+        OIIO::Strutil::split( data_dir, settings.database_directories, ":" );
+    }
+    else
+    {
+        settings.database_directories = database_paths();
+    }
 
     if ( arg_parser["list-cameras"].get<int>() )
     {
@@ -922,7 +943,11 @@ bool ImageConverter::parse_parameters( const OIIO::ArgParse &arg_parser )
 
     std::string matrix_method = arg_parser["mat-method"].get();
 
-    if ( matrix_method == "spectral" )
+    if ( matrix_method == "auto" )
+    {
+        settings.matrix_method = Settings::MatrixMethod::Auto;
+    }
+    else if ( matrix_method == "spectral" )
     {
         settings.matrix_method = Settings::MatrixMethod::Spectral;
     }
@@ -973,60 +998,69 @@ bool ImageConverter::parse_parameters( const OIIO::ArgParse &arg_parser )
     }
 
     auto WB_box = arg_parser["wb-box"].as_vec<int>();
-    check_param(
-        "white balancing mode",
-        "box",
-        "wb-box",
-        WB_box,
-        4,
-        "The box will be ignored.",
-        settings.WB_method == Settings::WBMethod::Box,
-        [&]() {
-            for ( int i = 0; i < 4; i++ )
-                settings.WB_box[i] = WB_box[i];
-        },
-        [&]() {
-            for ( int i = 0; i < 4; i++ )
-                settings.WB_box[i] = 0;
-        } );
+    if ( WB_box.size() == 4 )
+    {
+        check_param(
+            "white balancing mode",
+            "box",
+            "wb-box",
+            WB_box,
+            4,
+            "The box will be ignored.",
+            settings.WB_method == Settings::WBMethod::Box,
+            [&]() {
+                for ( int i = 0; i < 4; i++ )
+                    settings.WB_box[i] = WB_box[i];
+            },
+            [&]() {
+                for ( int i = 0; i < 4; i++ )
+                    settings.WB_box[i] = 0;
+            } );
+    }
 
     auto custom_WB = arg_parser["custom-wb"].as_vec<float>();
-    check_param(
-        "white balancing mode",
-        "custom",
-        "custom-wb",
-        custom_WB,
-        4,
-        "The scalers will be ignored. The default values of (1, 1, 1, 1) will be used",
-        settings.WB_method == Settings::WBMethod::Custom,
-        [&]() {
-            for ( int i = 0; i < 4; i++ )
-                settings.custom_WB[i] = custom_WB[i];
-        },
-        [&]() {
-            for ( int i = 0; i < 4; i++ )
-                settings.custom_WB[i] = 1.0;
-        } );
+    if ( custom_WB.size() == 4 )
+    {
+        check_param(
+            "white balancing mode",
+            "custom",
+            "custom-wb",
+            custom_WB,
+            4,
+            "The scalers will be ignored. The default values of (1, 1, 1, 1) will be used",
+            settings.WB_method == Settings::WBMethod::Custom,
+            [&]() {
+                for ( int i = 0; i < 4; i++ )
+                    settings.custom_WB[i] = custom_WB[i];
+            },
+            [&]() {
+                for ( int i = 0; i < 4; i++ )
+                    settings.custom_WB[i] = 1.0;
+            } );
+    }
 
     auto custom_matrix = arg_parser["custom-mat"].as_vec<float>();
-    check_param(
-        "matrix mode",
-        "custom",
-        "custom-mat",
-        custom_matrix,
-        9,
-        "Identity matrix will be used",
-        settings.matrix_method == Settings::MatrixMethod::Custom,
-        [&]() {
-            for ( int i = 0; i < 3; i++ )
-                for ( int j = 0; j < 3; j++ )
-                    settings.custom_matrix[i][j] = custom_matrix[i * 3 + j];
-        },
-        [&]() {
-            for ( int i = 0; i < 3; i++ )
-                for ( int j = 0; j < 3; j++ )
-                    settings.custom_matrix[i][j] = i == j ? 1.0 : 0.0;
-        } );
+    if ( custom_matrix.size() == 9 )
+    {
+        check_param(
+            "matrix mode",
+            "custom",
+            "custom-mat",
+            custom_matrix,
+            9,
+            "Identity matrix will be used",
+            settings.matrix_method == Settings::MatrixMethod::Custom,
+            [&]() {
+                for ( int i = 0; i < 3; i++ )
+                    for ( int j = 0; j < 3; j++ )
+                        settings.custom_matrix[i][j] = custom_matrix[i * 3 + j];
+            },
+            [&]() {
+                for ( int i = 0; i < 3; i++ )
+                    for ( int j = 0; j < 3; j++ )
+                        settings.custom_matrix[i][j] = i == j ? 1.0 : 0.0;
+            } );
+    }
 
     auto crop_box = arg_parser["crop-box"].as_vec<int>();
     if ( crop_box.size() == 4 )
@@ -1060,7 +1094,7 @@ bool ImageConverter::parse_parameters( const OIIO::ArgParse &arg_parser )
     }
 
     auto chromatic_aberration =
-        arg_parser["chromatic-aberration"].as_vec<int>();
+        arg_parser["chromatic-aberration"].as_vec<float>();
     if ( chromatic_aberration.size() == 2 )
     {
         for ( size_t i = 0; i < 2; i++ )
@@ -1119,7 +1153,7 @@ bool ImageConverter::parse_parameters( const OIIO::ArgParse &arg_parser )
             std::cerr << std::endl
                       << "Error: No matching light source. "
                       << "Please find available options by "
-                      << "\"rawtoaces --valid-illum\"." << std::endl;
+                      << "\"rawtoaces --list-illuminants\"." << std::endl;
             exit( -1 );
         }
     }
@@ -1338,6 +1372,31 @@ bool ImageConverter::configure(
                 << "ERROR: This white balancing method has not been configured "
                 << "properly." << std::endl;
             return false;
+    }
+
+    if ( settings.matrix_method == Settings::MatrixMethod::Auto )
+    {
+        core::SpectralSolver solver( settings.database_directories );
+        CameraIdentifier     camera_identifier =
+            get_camera_identifier( image_spec, settings );
+
+        if ( !camera_identifier.is_empty() &&
+             solver.find_camera(
+                 camera_identifier.make, camera_identifier.model ) )
+        {
+            settings.matrix_method = Settings::MatrixMethod::Spectral;
+        }
+        else
+        {
+            settings.matrix_method = Settings::MatrixMethod::Metadata;
+            if ( settings.verbosity > 0 )
+            {
+                std::cerr << "Info: Falling back to metadata matrix method "
+                          << "because no spectral data was found for camera "
+                          << static_cast<std::string>( camera_identifier )
+                          << std::endl;
+            }
+        }
     }
 
     switch ( settings.matrix_method )
