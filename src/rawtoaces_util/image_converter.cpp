@@ -40,14 +40,14 @@ struct CameraIdentifier
 
 /**
  * Checks if a file path is valid for processing and adds it to a batch list if appropriate.
- * 
+ *
  * This function validates that the given path points to a regular file or symbolic link,
  * filters out unwanted files (system files like .DS_Store and certain image formats like EXR and JPG),
  * and adds valid file paths to the provided batch vector for further processing.
- * 
+ *
  * @param path The filesystem path to check
  * @param batch Reference to a vector of strings to add valid file paths to
- * @return true if the file was processed (either added to batch or filtered out), 
+ * @return true if the file was processed (either added to batch or filtered out),
  *         false if the file should be ignored
  */
 void check_and_add_file(
@@ -113,11 +113,16 @@ collect_image_files( const std::vector<std::string> &paths )
 
 /// Gets the list of database paths for rawtoaces data files.
 ///
-/// Checks environment variables (RAWTOACES_DATA_PATH or deprecated AMPAS_DATA_PATH)
-/// and falls back to platform-specific default paths.
+/// Precedence:
+/// 1. If `override_path` is provided (non-empty), use it directly.
+/// 2. Else check RAWTOACES_DATA_PATH environment variable.
+/// 3. Else fallback to deprecated AMPAS_DATA_PATH (with warning).
+/// 4. Else use platform-specific default path.
 ///
+/// @param override_path Optional override path (may contain multiple
+///                      directories separated by ':' or ';')
 /// @return Vector of unique database directory paths
-std::vector<std::string> database_paths()
+std::vector<std::string> database_paths( const std::string &override_path = "" )
 {
     std::vector<std::string> result;
 
@@ -133,27 +138,34 @@ std::vector<std::string> database_paths()
 
     std::string path;
 
-    const char *path_from_env = getenv( "RAWTOACES_DATA_PATH" );
-    if ( !path_from_env )
+    if ( !override_path.empty() )
     {
-        // Fallback to the old environment variable.
-        path_from_env = getenv( "AMPAS_DATA_PATH" );
-
-        if ( path_from_env )
-        {
-            std::cerr << "Warning: The environment variable "
-                      << "AMPAS_DATA_PATH is now deprecated. Please use "
-                      << "RAWTOACES_DATA_PATH instead." << std::endl;
-        }
-    }
-
-    if ( path_from_env )
-    {
-        path = path_from_env;
+        path = override_path;
     }
     else
     {
-        path = default_path;
+        const char *path_from_env = getenv( "RAWTOACES_DATA_PATH" );
+        if ( !path_from_env )
+        {
+            // Fallback to the old environment variable.
+            path_from_env = getenv( "AMPAS_DATA_PATH" );
+
+            if ( path_from_env )
+            {
+                std::cerr << "Warning: The environment variable "
+                          << "AMPAS_DATA_PATH is now deprecated. Please use "
+                          << "RAWTOACES_DATA_PATH instead." << std::endl;
+            }
+        }
+
+        if ( path_from_env )
+        {
+            path = path_from_env;
+        }
+        else
+        {
+            path = default_path;
+        }
     }
 
     OIIO::Strutil::split( path, result, separator );
@@ -378,9 +390,10 @@ bool prepare_transform_spectral(
 
     if ( settings.verbosity > 0 )
     {
-        std::cerr << "Input transform matrix:" << std::endl;
+        std::cerr << "Input Device Transform (IDT) matrix:" << std::endl;
         for ( auto &row: IDT_matrix )
         {
+            std::cerr << "  ";
             for ( auto &col: row )
             {
                 std::cerr << col << " ";
@@ -544,6 +557,11 @@ provided using the -"custom-wb" parameter.
 
 Rawtoaces supports the following methods of color matrix 
 computation:
+- "auto" (recommended) first tries the "spectral" method if 
+spectral sensitivity data for the camera is available. If not, 
+it falls back to "metadata". This avoids failures when spectral 
+data is missing while still using the most accurate method 
+when possible.
 - "spectral" uses the camera sensor's spectral sensitivity data 
 to compute the optimal matrix. This mode requires spectral 
 sensitivity data for the camera model the image comes from. 
@@ -675,10 +693,10 @@ void ImageConverter::init_parser( OIIO::ArgParse &arg_parser )
 
     arg_parser.arg( "--mat-method" )
         .help(
-            "IDT matrix calculation method. Supported options: spectral, "
+            "IDT matrix calculation method. Supported options: auto, spectral, "
             "metadata, Adobe, custom." )
         .metavar( "STR" )
-        .defaultval( "spectral" )
+        .defaultval( "auto" )
         .action( OIIO::ArgParse::store() );
 
     arg_parser.arg( "--illuminant" )
@@ -741,6 +759,14 @@ void ImageConverter::init_parser( OIIO::ArgParse &arg_parser )
             "Allows overwriting existing files. If not set, trying to write "
             "to an existing file will generate an error." )
         .action( OIIO::ArgParse::store_true() );
+
+    arg_parser.arg( "--data-dir" )
+        .help(
+            "Directory containing rawtoaces spectral sensitivity and illuminant "
+            "data files. Overrides the default search path and the "
+            "RAWTOACES_DATA_PATH environment variable." )
+        .metavar( "STR" )
+        .action( OIIO::ArgParse::store() );
 
     arg_parser.arg( "--output-dir" )
         .help(
@@ -859,7 +885,7 @@ void ImageConverter::init_parser( OIIO::ArgParse &arg_parser )
     arg_parser.arg( "--verbose" )
         .help(
             "(-v) Print progress messages. "
-            "Repeated -v will increase verbosity." )
+            "Repeat -v to increase verbosity (e.g. -v -v, -v -v -v)." )
         .action( [&]( OIIO::cspan<const char *> /* argv */ ) {
             settings.verbosity++;
         } );
@@ -870,7 +896,15 @@ void ImageConverter::init_parser( OIIO::ArgParse &arg_parser )
 
 bool ImageConverter::parse_parameters( const OIIO::ArgParse &arg_parser )
 {
-    settings.database_directories = database_paths();
+    std::string data_dir = arg_parser["data-dir"].get();
+    if ( data_dir.size() )
+    {
+        settings.database_directories = database_paths( data_dir );
+    }
+    else
+    {
+        settings.database_directories = database_paths();
+    }
 
     if ( arg_parser["list-cameras"].get<int>() )
     {
@@ -923,7 +957,11 @@ bool ImageConverter::parse_parameters( const OIIO::ArgParse &arg_parser )
 
     std::string matrix_method = arg_parser["mat-method"].get();
 
-    if ( matrix_method == "spectral" )
+    if ( matrix_method == "auto" )
+    {
+        settings.matrix_method = Settings::MatrixMethod::Auto;
+    }
+    else if ( matrix_method == "spectral" )
     {
         settings.matrix_method = Settings::MatrixMethod::Spectral;
     }
@@ -1061,7 +1099,7 @@ bool ImageConverter::parse_parameters( const OIIO::ArgParse &arg_parser )
     }
 
     auto chromatic_aberration =
-        arg_parser["chromatic-aberration"].as_vec<int>();
+        arg_parser["chromatic-aberration"].as_vec<float>();
     if ( chromatic_aberration.size() == 2 )
     {
         for ( size_t i = 0; i < 2; i++ )
@@ -1121,7 +1159,7 @@ bool ImageConverter::parse_parameters( const OIIO::ArgParse &arg_parser )
             std::cerr << std::endl
                       << "Error: No matching light source. "
                       << "Please find available options by "
-                      << "\"rawtoaces --valid-illum\"." << std::endl;
+                      << "\"rawtoaces --list-illuminants\"." << std::endl;
             exit( -1 );
         }
     }
@@ -1342,7 +1380,33 @@ bool ImageConverter::configure(
             return false;
     }
 
-    switch ( settings.matrix_method )
+    Settings::MatrixMethod matrix_method = settings.matrix_method;
+    if ( settings.matrix_method == Settings::MatrixMethod::Auto )
+    {
+        core::SpectralSolver solver( settings.database_directories );
+        CameraIdentifier     camera_identifier =
+            get_camera_identifier( image_spec, settings );
+
+        if ( !camera_identifier.is_empty() &&
+             solver.find_camera(
+                 camera_identifier.make, camera_identifier.model ) )
+        {
+            matrix_method = Settings::MatrixMethod::Spectral;
+        }
+        else
+        {
+            matrix_method = Settings::MatrixMethod::Metadata;
+            if ( settings.verbosity > 0 )
+            {
+                std::cerr << "Info: Falling back to metadata matrix method "
+                          << "because no spectral data was found for camera "
+                          << static_cast<std::string>( camera_identifier )
+                          << std::endl;
+            }
+        }
+    }
+
+    switch ( matrix_method )
     {
         case Settings::MatrixMethod::Spectral:
             options["raw:ColorSpace"]        = "raw";
@@ -1379,8 +1443,7 @@ bool ImageConverter::configure(
 
     bool spectral_white_balance =
         settings.WB_method == Settings::WBMethod::Illuminant;
-    bool spectral_matrix =
-        settings.matrix_method == Settings::MatrixMethod::Spectral;
+    bool spectral_matrix = matrix_method == Settings::MatrixMethod::Spectral;
 
     if ( spectral_white_balance || spectral_matrix )
     {
@@ -1414,7 +1477,7 @@ bool ImageConverter::configure(
         }
     }
 
-    if ( settings.matrix_method == Settings::MatrixMethod::Metadata )
+    if ( matrix_method == Settings::MatrixMethod::Metadata )
     {
         if ( is_DNG )
         {
@@ -1435,9 +1498,107 @@ bool ImageConverter::configure(
             prepare_transform_nonDNG( _IDT_matrix, _CAT_matrix );
         }
     }
-    else if ( settings.matrix_method == Settings::MatrixMethod::Adobe )
+    else if ( matrix_method == Settings::MatrixMethod::Adobe )
     {
         prepare_transform_nonDNG( _IDT_matrix, _CAT_matrix );
+    }
+
+    if ( settings.verbosity > 1 )
+    {
+        std::cerr << "Configuration:" << std::endl;
+
+        std::cerr << "  WB method: ";
+        switch ( settings.WB_method )
+        {
+            case Settings::WBMethod::Metadata: std::cerr << "metadata"; break;
+            case Settings::WBMethod::Illuminant:
+                std::cerr << "illuminant";
+                break;
+            case Settings::WBMethod::Box: std::cerr << "box"; break;
+            case Settings::WBMethod::Custom: std::cerr << "custom"; break;
+        }
+        std::cerr << std::endl;
+
+        std::cerr << "  Matrix method: ";
+        switch ( settings.matrix_method )
+        {
+            case Settings::MatrixMethod::Auto: std::cerr << "auto"; break;
+            case Settings::MatrixMethod::Spectral:
+                std::cerr << "spectral";
+                break;
+            case Settings::MatrixMethod::Metadata:
+                std::cerr << "metadata";
+                break;
+            case Settings::MatrixMethod::Adobe: std::cerr << "Adobe"; break;
+            case Settings::MatrixMethod::Custom: std::cerr << "custom"; break;
+        }
+        std::cerr << std::endl;
+
+        if ( !settings.illuminant.empty() )
+        {
+            std::cerr << "  Illuminant: " << settings.illuminant << std::endl;
+        }
+
+        if ( !settings.custom_camera_make.empty() ||
+             !settings.custom_camera_model.empty() )
+        {
+            std::cerr << "  Camera override: " << settings.custom_camera_make
+                      << " / " << settings.custom_camera_model << std::endl;
+        }
+
+        if ( settings.WB_method == Settings::WBMethod::Box )
+        {
+            std::cerr << "  WB box: [" << settings.WB_box[0] << ", "
+                      << settings.WB_box[1] << ", " << settings.WB_box[2]
+                      << ", " << settings.WB_box[3] << "]" << std::endl;
+        }
+
+        if ( settings.WB_method == Settings::WBMethod::Custom )
+        {
+            std::cerr << "  Custom WB: [" << settings.custom_WB[0] << ", "
+                      << settings.custom_WB[1] << ", " << settings.custom_WB[2]
+                      << ", " << settings.custom_WB[3] << "]" << std::endl;
+        }
+
+        if ( settings.matrix_method == Settings::MatrixMethod::Custom )
+        {
+            std::cerr << "  Custom matrix:" << std::endl;
+            for ( int i = 0; i < 3; i++ )
+            {
+                std::cerr << "    [" << settings.custom_matrix[i][0] << " "
+                          << settings.custom_matrix[i][1] << " "
+                          << settings.custom_matrix[i][2] << "]" << std::endl;
+            }
+        }
+
+        std::cerr << "  Crop mode: ";
+        switch ( settings.crop_mode )
+        {
+            case Settings::CropMode::Off: std::cerr << "off"; break;
+            case Settings::CropMode::Soft: std::cerr << "soft"; break;
+            case Settings::CropMode::Hard: std::cerr << "hard"; break;
+        }
+        std::cerr << std::endl;
+
+        if ( settings.crop_box[2] > 0 && settings.crop_box[3] > 0 )
+        {
+            std::cerr << "  Crop box: [" << settings.crop_box[0] << ", "
+                      << settings.crop_box[1] << ", " << settings.crop_box[2]
+                      << ", " << settings.crop_box[3] << "]" << std::endl;
+        }
+
+        std::cerr << "  Demosaic: " << settings.demosaic_algorithm << std::endl;
+        std::cerr << "  Headroom: " << settings.headroom << std::endl;
+        std::cerr << "  Scale: " << settings.scale << std::endl;
+        std::cerr << "  Output dir: "
+                  << ( settings.output_dir.empty() ? "<same as input>"
+                                                   : settings.output_dir )
+                  << std::endl;
+        std::cerr << "  Overwrite: " << ( settings.overwrite ? "yes" : "no" )
+                  << std::endl;
+        std::cerr << "  Create dirs: "
+                  << ( settings.create_dirs ? "yes" : "no" ) << std::endl;
+        std::cerr << "  Verbosity: " << settings.verbosity << std::endl;
     }
 
     return true;
@@ -1668,7 +1829,11 @@ bool ImageConverter::process_image( const std::string &input_filename )
     usage_timer.enabled = settings.use_timing;
 
     // ___ Configure transform ___
-
+    if ( settings.verbosity > 0 )
+    {
+        std::cerr << "Configuring transform for: " << input_filename
+                  << std::endl;
+    }
     usage_timer.reset();
     OIIO::ParamValueList hints;
     if ( !configure( input_filename, hints ) )
@@ -1680,7 +1845,10 @@ bool ImageConverter::process_image( const std::string &input_filename )
     usage_timer.print( input_filename, "configuring reader" );
 
     // ___ Load image ___
-
+    if ( settings.verbosity > 0 )
+    {
+        std::cerr << "Loading image: " << input_filename << std::endl;
+    }
     usage_timer.reset();
     OIIO::ImageBuf buffer;
     if ( !load_image( input_filename, hints, buffer ) )
@@ -1691,7 +1859,10 @@ bool ImageConverter::process_image( const std::string &input_filename )
     usage_timer.print( input_filename, "reading image" );
 
     // ___ Apply matrix/matrices ___
-
+    if ( settings.verbosity > 0 )
+    {
+        std::cerr << "Applying transform matrix" << std::endl;
+    }
     usage_timer.reset();
     if ( !apply_matrix( buffer, buffer ) )
     {
@@ -1702,7 +1873,10 @@ bool ImageConverter::process_image( const std::string &input_filename )
     usage_timer.print( input_filename, "applying transform matrix" );
 
     // ___ Apply scale ___
-
+    if ( settings.verbosity > 0 )
+    {
+        std::cerr << "Applying scale" << std::endl;
+    }
     usage_timer.reset();
     if ( !apply_scale( buffer, buffer ) )
     {
@@ -1713,7 +1887,10 @@ bool ImageConverter::process_image( const std::string &input_filename )
     usage_timer.print( input_filename, "applying scale" );
 
     // ___ Apply crop ___
-
+    if ( settings.verbosity > 0 )
+    {
+        std::cerr << "Applying crop" << std::endl;
+    }
     usage_timer.reset();
     if ( !apply_crop( buffer, buffer ) )
     {
@@ -1724,7 +1901,10 @@ bool ImageConverter::process_image( const std::string &input_filename )
     usage_timer.print( input_filename, "applying crop" );
 
     // ___ Save image ___
-
+    if ( settings.verbosity > 0 )
+    {
+        std::cerr << "Saving output: " << output_filename << std::endl;
+    }
     usage_timer.reset();
     if ( !save_image( output_filename, buffer ) )
     {

@@ -16,8 +16,8 @@ namespace rta
 namespace util
 {
 
-std::vector<std::string> database_paths();
-
+std::vector<std::string>
+     database_paths( const std::string &override_path = "" );
 void fix_metadata( OIIO::ImageSpec &spec );
 
 } // namespace util

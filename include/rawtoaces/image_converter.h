@@ -52,6 +52,11 @@ public:
 
         enum class MatrixMethod
         {
+            /// Automatically choose the best available matrix method.
+            /// - If spectral sensitivity data for the camera is available,
+            ///   use `Spectral`.
+            /// - Otherwise, fall back to `Metadata`.
+            Auto,
             /// Use the camera spectral sensitivity curves to solve for the colour
             /// conversion matrix. In this mode the illuminant is either provided
             /// directly in `illuminant` if `WB_method` ==
@@ -67,7 +72,7 @@ public:
             /// Specify a custom matrix in `colourMatrix`. This mode is useful if
             /// the matrix is calculated by an external tool.
             Custom
-        } matrix_method = MatrixMethod::Spectral;
+        } matrix_method = MatrixMethod::Auto;
 
         /// Cropping mode.
         enum class CropMode

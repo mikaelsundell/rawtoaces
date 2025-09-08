@@ -163,6 +163,7 @@ A help message with a description of all command line options can be obtained by
     - "custom" uses the custom white balancing coefficients provided using the -"custom-wb" parameter.
 
     Rawtoaces supports the following methods of color matrix computation:
+    - "auto" (recommended) first tries the "spectral" method if spectral sensitivity data for the camera is available. If not, it falls back to "metadata". This avoids failures when spectral data is missing while still using the most accurate method when possible.
     - "spectral" uses the camera sensor's spectral sensitivity data to compute the optimal matrix. This mode requires spectral sensitivity data for the camera model the image comes from. The list of cameras such data is available for, can be seen using the "--list-cameras" parameter.
     - "metadata" uses the matrix (matrices) contained in the raw image file metadata. This mode works best with the images using the DNG format, as the DNG standard mandates the presense of such matrices.
     - "Adobe" uses the Adobe coefficients provided by LibRaw. 
@@ -179,7 +180,7 @@ A help message with a description of all command line options can be obtained by
         --help                          Print help message
         --version                       Print version and exit
         --wb-method STR                 White balance method. Supported options: metadata, illuminant, box, custom. (default: metadata)
-        --mat-method STR                IDT matrix calculation method. Supported options: spectral, metadata, Adobe, custom. (default: spectral)
+        --mat-method STR                IDT matrix calculation method. Supported options: auto, spectral, metadata, Adobe, custom. (default: auto)
         --illuminant STR                Illuminant for white balancing. (default = D55)
         --wb-box X Y W H                Box to use for white balancing. (default = (0,0,0,0) - full image)
         --custom-wb R G B G             Custom white balance multipliers.
@@ -191,6 +192,7 @@ A help message with a description of all command line options can be obtained by
         --scale VAL                     Additional scaling factor to apply to the pixel values. (default: 1)
     General options:
         --overwrite                     Allows overwriting existing files. If not set, trying to write to an existing file will generate an error.
+        --data-dir STR                  Directory containing rawtoaces spectral sensitivity and illuminant data files. Overrides the default search path and the RAWTOACES_DATA_PATH environment variable.
         --output-dir STR                The directory to write the output files to. This gets applied to every input directory, so it is better to be used with a single input directory.
         --create-dirs                   Create output directories if they don't exist.
         --disable-cache                 Disable the colour space transform cache.
@@ -270,7 +272,7 @@ If spectral sensitivity data for your camera is included with `rawtoaces` then t
 	
 This command is equivalent to :
 	
-	$ rawtoaces --wb-method metadata --mat-method spectral input.raw
+	$ rawtoaces --wb-method metadata --mat-method auto input.raw
 	
 To process mutiple raw files, you can try:
 	

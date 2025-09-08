@@ -40,17 +40,33 @@ int main( int argc, const char *argv[] )
     std::vector<std::vector<std::string>> batches =
         rta::util::collect_image_files( files );
 
-    // Process raw files ...
+    // Process raw files
     bool empty  = true;
     bool result = true;
+
+    size_t file_index  = 0;
+    size_t total_files = 0;
+
+    for ( auto const &batch: batches )
+        total_files += batch.size();
+
     for ( auto const &batch: batches )
     {
         for ( auto const &input_filename: batch )
         {
+            ++file_index;
+            std::cout << "[" << file_index << "/" << total_files
+                      << "] Processing file: " << input_filename << std::endl;
+
             empty  = false;
             result = converter.process_image( input_filename );
             if ( !result )
+            {
+                std::cerr << "Failed on file [" << file_index << "/"
+                          << total_files << "]: " << input_filename
+                          << std::endl;
                 break;
+            }
         }
         if ( !result )
             break;
