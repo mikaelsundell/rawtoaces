@@ -40,14 +40,14 @@ struct CameraIdentifier
 
 /**
  * Checks if a file path is valid for processing and adds it to a batch list if appropriate.
- * 
+ *
  * This function validates that the given path points to a regular file or symbolic link,
  * filters out unwanted files (system files like .DS_Store and certain image formats like EXR and JPG),
  * and adds valid file paths to the provided batch vector for further processing.
- * 
+ *
  * @param path The filesystem path to check
  * @param batch Reference to a vector of strings to add valid file paths to
- * @return true if the file was processed (either added to batch or filtered out), 
+ * @return true if the file was processed (either added to batch or filtered out),
  *         false if the file should be ignored
  */
 void check_and_add_file(
@@ -1011,69 +1011,60 @@ bool ImageConverter::parse_parameters( const OIIO::ArgParse &arg_parser )
     }
 
     auto WB_box = arg_parser["wb-box"].as_vec<int>();
-    if ( WB_box.size() == 4 )
-    {
-        check_param(
-            "white balancing mode",
-            "box",
-            "wb-box",
-            WB_box,
-            4,
-            "The box will be ignored.",
-            settings.WB_method == Settings::WBMethod::Box,
-            [&]() {
-                for ( int i = 0; i < 4; i++ )
-                    settings.WB_box[i] = WB_box[i];
-            },
-            [&]() {
-                for ( int i = 0; i < 4; i++ )
-                    settings.WB_box[i] = 0;
-            } );
-    }
+    check_param(
+        "white balancing mode",
+        "box",
+        "wb-box",
+        WB_box,
+        4,
+        "The box will be ignored.",
+        settings.WB_method == Settings::WBMethod::Box,
+        [&]() {
+            for ( int i = 0; i < 4; i++ )
+                settings.WB_box[i] = WB_box[i];
+        },
+        [&]() {
+            for ( int i = 0; i < 4; i++ )
+                settings.WB_box[i] = 0;
+        } );
 
     auto custom_WB = arg_parser["custom-wb"].as_vec<float>();
-    if ( custom_WB.size() == 4 )
-    {
-        check_param(
-            "white balancing mode",
-            "custom",
-            "custom-wb",
-            custom_WB,
-            4,
-            "The scalers will be ignored. The default values of (1, 1, 1, 1) will be used",
-            settings.WB_method == Settings::WBMethod::Custom,
-            [&]() {
-                for ( int i = 0; i < 4; i++ )
-                    settings.custom_WB[i] = custom_WB[i];
-            },
-            [&]() {
-                for ( int i = 0; i < 4; i++ )
-                    settings.custom_WB[i] = 1.0;
-            } );
-    }
+    check_param(
+        "white balancing mode",
+        "custom",
+        "custom-wb",
+        custom_WB,
+        4,
+        "The scalers will be ignored. The default values of (1, 1, 1, 1) will be used",
+        settings.WB_method == Settings::WBMethod::Custom,
+        [&]() {
+            for ( int i = 0; i < 4; i++ )
+                settings.custom_WB[i] = custom_WB[i];
+        },
+        [&]() {
+            for ( int i = 0; i < 4; i++ )
+                settings.custom_WB[i] = 1.0;
+        } );
 
     auto custom_matrix = arg_parser["custom-mat"].as_vec<float>();
-    if ( custom_matrix.size() == 9 )
-    {
-        check_param(
-            "matrix mode",
-            "custom",
-            "custom-mat",
-            custom_matrix,
-            9,
-            "Identity matrix will be used",
-            settings.matrix_method == Settings::MatrixMethod::Custom,
-            [&]() {
-                for ( int i = 0; i < 3; i++ )
-                    for ( int j = 0; j < 3; j++ )
-                        settings.custom_matrix[i][j] = custom_matrix[i * 3 + j];
-            },
-            [&]() {
-                for ( int i = 0; i < 3; i++ )
-                    for ( int j = 0; j < 3; j++ )
-                        settings.custom_matrix[i][j] = i == j ? 1.0 : 0.0;
-            } );
-    }
+    check_param(
+        "matrix mode",
+        "custom",
+        "custom-mat",
+        custom_matrix,
+        9,
+        "Identity matrix will be used",
+        settings.matrix_method == Settings::MatrixMethod::Custom,
+        [&]() {
+            for ( int i = 0; i < 3; i++ )
+                for ( int j = 0; j < 3; j++ )
+                    settings.custom_matrix[i][j] = custom_matrix[i * 3 + j];
+        },
+        [&]() {
+            for ( int i = 0; i < 3; i++ )
+                for ( int j = 0; j < 3; j++ )
+                    settings.custom_matrix[i][j] = i == j ? 1.0 : 0.0;
+        } );
 
     auto crop_box = arg_parser["crop-box"].as_vec<int>();
     if ( crop_box.size() == 4 )
