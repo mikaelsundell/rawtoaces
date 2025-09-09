@@ -1,4 +1,5 @@
 .DS_Store
+.vscode
 build/
 build-coverage/
 tests/materials/*.exr

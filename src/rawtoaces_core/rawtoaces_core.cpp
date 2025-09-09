@@ -688,19 +688,6 @@ bool curveFit(
         out_IDT_matrix[2][1] = beta_params[5];
         out_IDT_matrix[2][2] = 1.0 - beta_params[4] - beta_params[5];
 
-        if ( verbosity > 1 )
-        {
-            printf( "The IDT matrix is ...\n" );
-            FORI( 3 )
-            {
-                printf(
-                    "   %f %f %f\n",
-                    out_IDT_matrix[i][0],
-                    out_IDT_matrix[i][1],
-                    out_IDT_matrix[i][2] );
-            }
-        }
-
         return true;
     }
 

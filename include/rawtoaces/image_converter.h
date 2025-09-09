@@ -259,6 +259,17 @@ public:
     ///    `true` if processed successfully.
     bool process_image( const std::string &input_filename );
 
+    /// Process a batch of input files or directories.
+    /// This will iterate over each batch and call process_image() on every file.
+    /// @param batches
+    ///     Vector of batches, each batch is a vector of filenames.
+    /// @param empty
+    ///     Output flag that becomes true if no files were processed.
+    /// @result
+    ///     true if all files were processed successfully, false otherwise.
+    bool process_batch(
+        const std::vector<std::vector<std::string>> &batches, bool &empty );
+
     /// Get the solved white balance multipliers of the currently processed
     /// image. The multipliers become available after calling either of the
     /// two `configure` methods.
