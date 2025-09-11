@@ -11,16 +11,16 @@ namespace rta
 namespace util
 {
 
-/// Collect all files from a given `path` into batchs. If the `path` is a
-/// directory, create an entry in `batches` and fill it with the file names
-/// from that directory. If the `path` is a file, add its name to the first
-/// entry in `batches`.
-/// @param path path to a file or directory to process.
-/// @param batches the collection of batches to fill in.
-/// @result `false` if the file or directory requested in `path` does not
-/// exist.
-bool collect_image_files(
-    const std::string &path, std::vector<std::vector<std::string>> &batches );
+/// Collect all files from given `paths` into batches.
+/// For each path that is a directory, entries are created in the returned batches
+/// and fill it with the file names. Invalid paths are skipped with an error message.
+/// First batch is reserved for all paths that are files. If no such paths are provided,
+/// first batch will be empty.
+///
+/// @param paths vector of paths to files or directories to process.
+/// @return vector of batches, where each batch contains files from one input path.
+std::vector<std::vector<std::string>>
+collect_image_files( const std::vector<std::string> &paths );
 
 class ImageConverter
 {

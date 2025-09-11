@@ -50,7 +50,7 @@ struct CameraIdentifier
  * @return true if the file was processed (either added to batch or filtered out), 
  *         false if the file should be ignored
  */
-bool check_and_add_file(
+void check_and_add_file(
     const std::filesystem::path &path, std::vector<std::string> &batch )
 {
     bool is_regular_file = std::filesystem::is_regular_file( path ) ||
@@ -58,52 +58,57 @@ bool check_and_add_file(
     if ( !is_regular_file )
     {
         std::cerr << "Not a regular file: " << path << std::endl;
-        return false;
+        return;
     }
 
     static const std::set<std::string> ignore_filenames = { ".DS_Store" };
     std::string                        filename = path.filename().string();
     if ( ignore_filenames.count( filename ) > 0 )
-        return false;
+        return;
 
     static const std::set<std::string> ignore_extensions = { ".exr",
                                                              ".jpg",
                                                              ".jpeg" };
     std::string extension = OIIO::Strutil::lower( path.extension().string() );
     if ( ignore_extensions.count( extension ) > 0 )
-        return false;
+        return;
 
     batch.push_back( path.string() );
-
-    return true;
+    return;
 }
 
-bool collect_image_files(
-    const std::string &path, std::vector<std::vector<std::string>> &batches )
+std::vector<std::vector<std::string>>
+collect_image_files( const std::vector<std::string> &paths )
 {
-    if ( !std::filesystem::exists( path ) )
+    std::vector<std::vector<std::string>> batches( 1 );
+
+    for ( const auto &path: paths )
     {
-        return false;
-    }
-
-    auto canonical_filename = std::filesystem::canonical( path );
-
-    if ( std::filesystem::is_directory( path ) )
-    {
-        std::vector<std::string> &curr_batch = batches.emplace_back();
-        auto it = std::filesystem::directory_iterator( path );
-
-        for ( auto filename: it )
+        if ( !std::filesystem::exists( path ) )
         {
-            check_and_add_file( filename, curr_batch );
+            std::cerr << "File or directory not found: " << path << std::endl;
+            continue;
+        }
+
+        auto canonical_filename = std::filesystem::canonical( path );
+
+        if ( std::filesystem::is_directory( path ) )
+        {
+            std::vector<std::string> &curr_batch = batches.emplace_back();
+            auto it = std::filesystem::directory_iterator( path );
+
+            for ( auto filename: it )
+            {
+                check_and_add_file( filename, curr_batch );
+            }
+        }
+        else
+        {
+            check_and_add_file( path, batches[0] );
         }
     }
-    else
-    {
-        check_and_add_file( path, batches[0] );
-    }
 
-    return true;
+    return batches;
 }
 
 /// Gets the list of database paths for rawtoaces data files.
@@ -1165,6 +1170,8 @@ std::vector<std::string> ImageConverter::supported_cameras()
 /// Normalise the metadata in the cases where the OIIO attribute name
 /// doesn't match the standard OpenEXR and/or ACES Container attribute name.
 /// We only check the attribute names which are set by the raw input plugin.
+///
+/// @param spec ImageSpec to modify
 void fix_metadata( OIIO::ImageSpec &spec )
 {
     const std::map<std::string, std::string> standard_mapping = {
@@ -1186,8 +1193,6 @@ void fix_metadata( OIIO::ImageSpec &spec )
             {
                 if ( type.basetype == OIIO::TypeDesc::STRING )
                     spec[dst_name] = src_attribute->get_string();
-                else if ( type.basetype == OIIO::TypeDesc::FLOAT )
-                    spec[dst_name] = src_attribute->get_float();
             }
             spec.erase_attribute( src_name );
         }
