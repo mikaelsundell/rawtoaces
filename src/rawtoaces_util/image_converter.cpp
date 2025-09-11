@@ -1915,51 +1915,6 @@ bool ImageConverter::process_image( const std::string &input_filename )
     return ( true );
 }
 
-bool ImageConverter::process_batch(
-    const std::vector<std::vector<std::string>> &batches, bool &empty )
-{
-    empty       = true;
-    bool result = true;
-
-    size_t total_files = 0;
-    for ( const auto &batch: batches )
-        total_files += batch.size();
-
-    size_t file_index = 0;
-
-    for ( auto const &batch: batches )
-    {
-        for ( auto const &input_filename: batch )
-        {
-            empty = false;
-            ++file_index;
-
-            if ( settings.verbosity > 0 )
-            {
-                std::cerr << "[" << file_index << "/" << total_files
-                          << "] Processing file: " << input_filename
-                          << std::endl;
-            }
-
-            result = process_image( input_filename );
-            if ( !result )
-            {
-                if ( settings.verbosity > 0 )
-                {
-                    std::cerr << "Failed on file [" << file_index << "/"
-                              << total_files << "]: " << input_filename
-                              << std::endl;
-                }
-                break;
-            }
-        }
-        if ( !result )
-            break;
-    }
-
-    return result;
-}
-
 const std::vector<double> &ImageConverter::get_WB_multipliers()
 {
     return _WB_multipliers;
