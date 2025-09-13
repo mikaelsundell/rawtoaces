@@ -44,11 +44,11 @@ int main( int argc, const char *argv[] )
     bool empty  = true;
     bool result = true;
 
-    int file_index  = 0;
-    int total_files = 0;
+    size_t file_index  = 0;
+    size_t total_files = 0;
 
     for ( auto const &batch: batches )
-        total_files += static_cast<int>( batch.size() );
+        total_files += batch.size();
 
     for ( auto const &batch: batches )
     {
