@@ -56,8 +56,6 @@ public:
             /// - If spectral sensitivity data for the camera is available,
             ///   use `Spectral`.
             /// - Otherwise, fall back to `Metadata`.
-            /// The "auto" mode solves this by first attempting "spectral", and if no
-            /// spectral data is available for the camera, it falls back to "metadata".
             Auto,
             /// Use the camera spectral sensitivity curves to solve for the colour
             /// conversion matrix. In this mode the illuminant is either provided
