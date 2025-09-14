@@ -44,7 +44,7 @@ vector<double> CCT_to_xy( const double &cct )
 
 void calculate_daylight_SPD( const int &cct_input, Spectrum &spectrum )
 {
-    int step             = spectrum.shape.step;
+    int step             = static_cast<int>( spectrum.shape.step );
     int wavelength_range = s_series[53].wl - s_series[0].wl;
     assert( wavelength_range % step == 0 );
 
@@ -72,7 +72,7 @@ void calculate_daylight_SPD( const int &cct_input, Spectrum &spectrum )
     double m1 = ( -1.3515 - 1.7703 * xy[0] + 5.9114 * xy[1] ) / m0;
     double m2 = ( 0.03000 - 31.4424 * xy[0] + 30.0717 * xy[1] ) / m0;
 
-    FORI( countSize( s_series ) )
+    for ( int i = 0; i < countSize( s_series ); i++ )
     {
         wavelengths.push_back( s_series[i].wl );
         s00.push_back( s_series[i].RGB[0] );
@@ -81,7 +81,7 @@ void calculate_daylight_SPD( const int &cct_input, Spectrum &spectrum )
     }
 
     int num_wavelengths = wavelength_range / step + 1;
-    FORI( num_wavelengths )
+    for ( int i = 0; i < num_wavelengths; i++ )
     {
         wavelengths_interpolated.push_back( s_series[0].wl + step * i );
     }
@@ -90,7 +90,7 @@ void calculate_daylight_SPD( const int &cct_input, Spectrum &spectrum )
     s11 = interp1DLinear( wavelengths, wavelengths_interpolated, s10 );
     s21 = interp1DLinear( wavelengths, wavelengths_interpolated, s20 );
 
-    FORI( num_wavelengths )
+    for ( int i = 0; i < num_wavelengths; i++ )
     {
         int wavelength = s_series[0].wl + step * i;
         if ( wavelength >= 380 && wavelength <= 780 )
@@ -170,11 +170,11 @@ SpectralSolver::SpectralSolver(
     verbosity = 0;
     _IDT_matrix.resize( 3 );
     _WB_multipliers.resize( 3 );
-    FORI( 3 )
+    for ( int i = 0; i < 3; i++ )
     {
         _IDT_matrix[i].resize( 3 );
         _WB_multipliers[i] = 1.0;
-        FORJ( 3 )
+        for ( size_t j = 0; j < 3; j++ )
         {
             _IDT_matrix[i][j] = neutral3[i][j];
         }
@@ -272,12 +272,12 @@ bool SpectralSolver::load_spectral_data(
     {
         for ( const auto &directory: _search_directories )
         {
-            std::filesystem::path path( directory );
-            path.append( file_path );
+            std::filesystem::path search_path( directory );
+            search_path.append( file_path );
 
-            if ( std::filesystem::exists( path ) )
+            if ( std::filesystem::exists( search_path ) )
             {
-                return out_data.load( path.string() );
+                return out_data.load( search_path.string() );
             }
         }
 
@@ -320,16 +320,16 @@ bool SpectralSolver::find_illuminant( const std::string &type )
 
     if ( is_daylight )
     {
-        int               cct  = atoi( type.substr( 1 ).c_str() );
-        const std::string type = "d" + std::to_string( cct );
-        generate_illuminant( cct, type, true, illuminant );
+        int               cct             = atoi( type.substr( 1 ).c_str() );
+        const std::string illuminant_type = "d" + std::to_string( cct );
+        generate_illuminant( cct, illuminant_type, true, illuminant );
         return true;
     }
     else if ( is_blackbody )
     {
         int cct = atoi( type.substr( 0, type.length() - 1 ).c_str() );
-        const std::string type = std::to_string( cct ) + "k";
-        generate_illuminant( cct, type, false, illuminant );
+        const std::string illuminant_type = std::to_string( cct ) + "k";
+        generate_illuminant( cct, illuminant_type, false, illuminant );
         return true;
     }
     else
@@ -364,25 +364,25 @@ bool SpectralSolver::find_illuminant( const vector<double> &wb )
         // Daylight - pre-calculate
         for ( int cct = 4000; cct <= 25000; cct += 500 )
         {
-            SpectralData     &illuminant = _all_illuminants.emplace_back();
-            const std::string type       = "d" + std::to_string( cct / 100 );
-            generate_illuminant( cct, type, true, illuminant );
+            SpectralData     &illuminant_data = _all_illuminants.emplace_back();
+            const std::string type = "d" + std::to_string( cct / 100 );
+            generate_illuminant( cct, type, true, illuminant_data );
         }
 
         // Blackbody - pre-calculate
         for ( int cct = 1500; cct < 4000; cct += 500 )
         {
-            SpectralData     &illuminant = _all_illuminants.emplace_back();
-            const std::string type       = std::to_string( cct ) + "k";
-            generate_illuminant( cct, type, false, illuminant );
+            SpectralData     &illuminant_data = _all_illuminants.emplace_back();
+            const std::string type            = std::to_string( cct ) + "k";
+            generate_illuminant( cct, type, false, illuminant_data );
         }
 
         auto illuminant_files = collect_data_files( "illuminant" );
 
         for ( const auto &illuminant_file: illuminant_files )
         {
-            SpectralData &illuminant = _all_illuminants.emplace_back();
-            if ( !illuminant.load( illuminant_file ) )
+            SpectralData &illuminant_data = _all_illuminants.emplace_back();
+            if ( !illuminant_data.load( illuminant_file ) )
             {
                 _all_illuminants.pop_back();
                 continue;
@@ -578,17 +578,15 @@ std::vector<std::vector<double>> calculate_XYZ(
 /// @return 2D vector containing RGB values for each training patch
 std::vector<std::vector<double>> calculate_RGB(
     const SpectralData          &camera,
-    const SpectralData          &illuminant,
     const std::vector<double>   &WB_multipliers,
     const std::vector<Spectrum> &training_illuminants )
 {
     assert( training_illuminants.size() > 0 );
     assert( training_illuminants[0].values.size() == 81 );
 
-    const Spectrum &camera_r            = camera["R"];
-    const Spectrum &camera_g            = camera["G"];
-    const Spectrum &camera_b            = camera["B"];
-    const Spectrum &illuminant_spectrum = illuminant["power"];
+    const Spectrum &camera_r = camera["R"];
+    const Spectrum &camera_g = camera["G"];
+    const Spectrum &camera_b = camera["B"];
 
     std::vector<std::vector<double>> RGB;
     for ( auto &training_illuminant: training_illuminants )
@@ -691,7 +689,7 @@ bool curveFit(
         if ( verbosity > 1 )
         {
             printf( "The IDT matrix is ...\n" );
-            FORI( 3 )
+            for ( int i = 0; i < 3; i++ )
             {
                 printf(
                     "   %f %f %f\n",
@@ -748,7 +746,7 @@ bool SpectralSolver::calculate_IDT_matrix()
     double beta_params_start[6] = { 1.0, 0.0, 0.0, 1.0, 0.0, 0.0 };
 
     auto TI  = calculate_TI( illuminant, training_data );
-    auto RGB = calculate_RGB( camera, illuminant, _WB_multipliers, TI );
+    auto RGB = calculate_RGB( camera, _WB_multipliers, TI );
     auto XYZ = calculate_XYZ( observer, illuminant, TI );
 
     return curveFit( RGB, XYZ, beta_params_start, verbosity, _IDT_matrix );
@@ -843,7 +841,7 @@ double light_source_to_color_temp( const unsigned short tag )
         { 20, 5500 }, { 21, 6500 }, { 22, 7500 }
     };
 
-    FORI( countSize( exif_light_source_temperature_map ) )
+    for ( int i = 0; i < countSize( exif_light_source_temperature_map ); i++ )
     {
         if ( exif_light_source_temperature_map[i][0] ==
              static_cast<uint16_t>( tag ) )
@@ -1108,7 +1106,7 @@ vector<double> matrix_RGB_to_XYZ( const double chromaticities[][2] )
         xy_to_XYZ( vector<double>( chromaticities[3], chromaticities[3] + 2 ) );
 
     vector<double> rgb_matrix( 9 );
-    FORI( 3 )
+    for ( int i = 0; i < 3; i++ )
     {
         rgb_matrix[0 + i * 3] = red_XYZ[i];
         rgb_matrix[1 + i * 3] = green_XYZ[i];
@@ -1193,18 +1191,21 @@ vector<vector<double>> MetadataSolver::calculate_IDT_matrix()
 
     // 2. Converts the CAT matrix to a flattened format for matrix multiplication
     vector<double> XYZ_D65_acesrgb( 9 ), CAT( 9 );
-    FORIJ( 3, 3 )
-    {
-        XYZ_D65_acesrgb[i * 3 + j] = XYZ_D65_acesrgb_3[i][j];
-        CAT[i * 3 + j]             = CAT_matrix[i][j];
-    }
+    for ( size_t i = 0; i < 3; i++ )
+        for ( size_t j = 0; j < 3; j++ )
+        {
+            XYZ_D65_acesrgb[i * 3 + j] = XYZ_D65_acesrgb_3[i][j];
+            CAT[i * 3 + j]             = CAT_matrix[i][j];
+        }
 
     // 3. Multiplies the D65 ACES RGB to XYZ matrix with the CAT matrix
     vector<double> matrix = mulVector( XYZ_D65_acesrgb, CAT, 3 );
 
     // 4. Reshapes the result into a 3×3 transformation matrix
     vector<vector<double>> DNG_IDT_matrix( 3, vector<double>( 3 ) );
-    FORIJ( 3, 3 ) DNG_IDT_matrix[i][j] = matrix[i * 3 + j];
+    for ( size_t i = 0; i < 3; i++ )
+        for ( size_t j = 0; j < 3; j++ )
+            DNG_IDT_matrix[i][j] = matrix[i * 3 + j];
 
     // 5. Validates the matrix properties (non-zero determinant)
     assert( std::fabs( sumVectorM( DNG_IDT_matrix ) - 0.0 ) > 1e-09 );
@@ -1232,11 +1233,15 @@ template <typename T>
 bool IDTOptimizationCost::operator()( const T *beta_params, T *residuals ) const
 {
     vector<vector<T>> RGB_copy( 190, vector<T>( 3 ) );
-    FORIJ( 190, 3 ) RGB_copy[i][j] = T( _RGB[i][j] );
+    for ( size_t i = 0; i < 190; i++ )
+        for ( size_t j = 0; j < 3; j++ )
+            RGB_copy[i][j] = T( _RGB[i][j] );
 
     vector<vector<T>> out_calc_LAB =
         XYZ_to_LAB( getCalcXYZt( RGB_copy, beta_params ) );
-    FORIJ( 190, 3 ) residuals[i * 3 + j] = _outLAB[i][j] - out_calc_LAB[i][j];
+    for ( size_t i = 0; i < 190; i++ )
+        for ( size_t j = 0; j < 3; j++ )
+            residuals[i * 3 + j] = _outLAB[i][j] - out_calc_LAB[i][j];
 
     return true;
 }

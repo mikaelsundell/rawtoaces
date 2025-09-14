@@ -24,7 +24,7 @@
 #    include <windows.h>
 //#    define snprintf _snprintf
 #    define _CRT_SECURE_NO_WARNINGS
-#    define cmp_str stricmp
+#    define cmp_str _stricmp
 #else
 #    define cmp_str strcasecmp
 #endif
@@ -37,11 +37,6 @@
 #    define FALSE 0
 #endif
 
-#define FORI( val ) for ( int i = 0; i < val; i++ )
-#define FORJ( val ) for ( int j = 0; j < val; j++ )
-#define FORIJ( val1, val2 )                                                    \
-    for ( int i = 0; i < val1; i++ )                                           \
-        for ( int j = 0; j < val2; j++ )
 #define countSize( a ) ( static_cast<int>( sizeof( a ) / sizeof( ( a )[0] ) ) )
 
 namespace rta
@@ -263,16 +258,16 @@ inline std::vector<std::string> openDir( std::string path = "." )
     }
 
     return paths;
-};
+}
 
 // Function to covert upper-case to lower-case
 inline void lowerCase( char *tex )
 {
     std::string tmp( tex );
 
-    FORI( tmp.size() )
-    tex[i] = tolower( tex[i] );
-};
+    for ( size_t i = 0; i < tmp.size(); i++ )
+        tex[i] = static_cast<char>( tolower( tex[i] ) );
+}
 
 // Function to check if a value is numeric
 inline bool isNumeric( const char *val )
@@ -283,7 +278,7 @@ inline bool isNumeric( const char *val )
     return (
         input.find_first_not_of( base.substr( 0, base.size() ) ) ==
         std::string::npos );
-};
+}
 
 // Function to check if a input is a alphabetic letter
 inline bool isCTLetterDigit( const char c )
@@ -291,13 +286,13 @@ inline bool isCTLetterDigit( const char c )
     return (
         ( c >= 'a' && c <= 'z' ) || ( c >= 'A' && c <= 'Z' ) || ( c == '-' ) ||
         isdigit( c ) );
-};
+}
 
 // Function to check if a string is a valid input
 // to represent color temperature(s) (e.g., D60, 3200K)
 inline bool isValidCT( std::string str )
 {
-    int    i      = 0;
+    size_t i      = 0;
     size_t length = str.length();
 
     if ( length == 0 )
@@ -344,7 +339,7 @@ inline bool isValidCT( std::string str )
         return false;
 
     return true;
-};
+}
 
 } // namespace core
 } // namespace rta

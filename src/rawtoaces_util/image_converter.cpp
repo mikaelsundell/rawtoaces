@@ -159,7 +159,7 @@ std::vector<std::string> database_paths()
     OIIO::Strutil::split( path, result, separator );
 
     return result;
-};
+}
 
 /// Get camera info (with make and model) from image metadata or custom settings.
 ///
@@ -443,7 +443,7 @@ bool prepare_transform_DNG(
         // Extract illuminant type for this calibration
         auto key = "raw:dng:calibration_illuminant" + index_string;
         metadata.calibration[k].illuminant =
-            image_spec.get_int_attribute( key );
+            static_cast<unsigned short>( image_spec.get_int_attribute( key ) );
 
         // Extract XYZ to RGB color matrix
         auto key1         = "raw:dng:color_matrix" + index_string;
@@ -860,11 +860,12 @@ void ImageConverter::init_parser( OIIO::ArgParse &arg_parser )
         .help(
             "(-v) Print progress messages. "
             "Repeated -v will increase verbosity." )
-        .action(
-            [&]( OIIO::cspan<const char *> argv ) { settings.verbosity++; } );
+        .action( [&]( OIIO::cspan<const char *> /* argv */ ) {
+            settings.verbosity++;
+        } );
 
     arg_parser.arg( "-v" ).hidden().action(
-        [&]( OIIO::cspan<const char *> argv ) { settings.verbosity++; } );
+        [&]( OIIO::cspan<const char *> /* argv */ ) { settings.verbosity++; } );
 }
 
 bool ImageConverter::parse_parameters( const OIIO::ArgParse &arg_parser )
@@ -1025,7 +1026,7 @@ bool ImageConverter::parse_parameters( const OIIO::ArgParse &arg_parser )
         [&]() {
             for ( int i = 0; i < 3; i++ )
                 for ( int j = 0; j < 3; j++ )
-                    settings.custom_matrix[i][j] = i == j ? 1.0 : 0.0;
+                    settings.custom_matrix[i][j] = i == j ? 1.0f : 0.0f;
         } );
 
     auto crop_box = arg_parser["crop-box"].as_vec<int>();
@@ -1064,7 +1065,8 @@ bool ImageConverter::parse_parameters( const OIIO::ArgParse &arg_parser )
     if ( chromatic_aberration.size() == 2 )
     {
         for ( size_t i = 0; i < 2; i++ )
-            settings.chromatic_aberration[i] = chromatic_aberration[i];
+            settings.chromatic_aberration[i] =
+                static_cast<float>( chromatic_aberration[i] );
     }
 
     auto demosaic_algorithm = arg_parser["demosaic"].get();
@@ -1094,7 +1096,7 @@ bool ImageConverter::parse_parameters( const OIIO::ArgParse &arg_parser )
     settings.headroom    = arg_parser["headroom"].get<float>();
     settings.auto_bright = arg_parser["auto-bright"].get<int>();
     settings.adjust_maximum_threshold =
-        arg_parser["adjust-maximum-threshold"].get<int>();
+        arg_parser["adjust-maximum-threshold"].get<float>();
     settings.black_level      = arg_parser["black-level"].get<int>();
     settings.saturation_level = arg_parser["saturation-level"].get<int>();
     settings.half_size        = arg_parser["half-size"].get<int>();
@@ -1400,10 +1402,10 @@ bool ImageConverter::configure(
 
             for ( size_t i = 0; i < _WB_multipliers.size(); i++ )
             {
-                custom_WB[i] = _WB_multipliers[i];
+                custom_WB[i] = static_cast<float>( _WB_multipliers[i] );
             }
             if ( _WB_multipliers.size() == 3 )
-                custom_WB[3] = _WB_multipliers[1];
+                custom_WB[3] = static_cast<float>( _WB_multipliers[1] );
 
             options.attribute(
                 "raw:user_mul",
@@ -1472,7 +1474,7 @@ bool apply_matrix(
         {
             for ( size_t j = 0; j < num_columns; j++ )
             {
-                M[j][i] = matrix[i][j];
+                M[j][i] = static_cast<float>( matrix[i][j] );
             }
 
             for ( size_t j = num_columns; j < 4; j++ )
@@ -1521,14 +1523,14 @@ bool ImageConverter::apply_matrix(
 }
 
 bool ImageConverter::apply_scale(
-    OIIO::ImageBuf &dst, const OIIO::ImageBuf &src, OIIO::ROI roi )
+    OIIO::ImageBuf &dst, const OIIO::ImageBuf &src, OIIO::ROI /* roi */ )
 {
     return OIIO::ImageBufAlgo::mul(
         dst, src, settings.headroom * settings.scale );
 }
 
 bool ImageConverter::apply_crop(
-    OIIO::ImageBuf &dst, const OIIO::ImageBuf &src, OIIO::ROI roi )
+    OIIO::ImageBuf &dst, const OIIO::ImageBuf &src, OIIO::ROI /* roi */ )
 {
     if ( settings.crop_mode == Settings::CropMode::Off )
     {
@@ -1633,8 +1635,8 @@ bool ImageConverter::save_image(
     // - acesImageContainerFlag present,
     // - no compression.
 
-    const float chromaticities[] = { 0.7347, 0.2653, 0,       1,
-                                     0.0001, -0.077, 0.32168, 0.33767 };
+    const float chromaticities[] = { 0.7347f, 0.2653f, 0.0f,     1.0f,
+                                     0.0001f, -0.077f, 0.32168f, 0.33767f };
 
     OIIO::ImageSpec image_spec = buf.spec();
     image_spec.set_format( OIIO::TypeDesc::HALF );

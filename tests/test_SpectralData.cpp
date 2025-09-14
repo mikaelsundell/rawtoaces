@@ -17,7 +17,7 @@
 void init_Spectrum( rta::core::Spectrum &spectrum )
 {
     for ( size_t i = 0; i < spectrum.values.size(); i++ )
-        spectrum.values[i] = i;
+        spectrum.values[i] = static_cast<double>( i );
 }
 
 void check_Spectrum(
@@ -239,7 +239,7 @@ void testSpectralData_LoadSpst()
             OIIO_CHECK_EQUAL_THRESH( spectrum.values[j], rgb[j][i], 1e-5 );
         }
     }
-};
+}
 
 int main( int, char ** )
 {

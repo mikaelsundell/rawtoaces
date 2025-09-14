@@ -13,7 +13,7 @@ void testIDT_CcttoMired()
     double cct   = 6500.0;
     double mired = rta::core::CCT_to_mired( cct );
     OIIO_CHECK_EQUAL_THRESH( mired, 153.8461538462, 1e-5 );
-};
+}
 
 void testIDT_RobertsonLength()
 {
@@ -23,14 +23,14 @@ void testIDT_RobertsonLength()
     std::vector<double> uvtVector( uvt, uvt + 3 );
     double rLength = rta::core::robertson_length( uvVector, uvtVector );
     OIIO_CHECK_EQUAL_THRESH( rLength, 0.060234937, 1e-5 );
-};
+}
 
 void testIDT_LightSourceToColorTemp()
 {
     unsigned short tag = 17;
     double         ct  = rta::core::light_source_to_color_temp( tag );
     OIIO_CHECK_EQUAL_THRESH( ct, 2856.0, 1e-5 );
-};
+}
 
 void init_metadata( rta::core::Metadata &metadata )
 {
@@ -61,7 +61,7 @@ void testIDT_XYZToColorTemperature()
     double              cct = rta::core::XYZ_to_color_temperature( XYZVector );
 
     OIIO_CHECK_EQUAL_THRESH( cct, 5564.6648479019, 1e-5 );
-};
+}
 
 void testIDT_XYZtoCameraWeightedMatrix()
 {
@@ -82,9 +82,9 @@ void testIDT_XYZtoCameraWeightedMatrix()
         mirs[0], mirs[1], mirs[2], matrix1, matrix2 );
     delete di;
 
-    FORI( countSize( matrix ) )
-    OIIO_CHECK_EQUAL_THRESH( result[i], matrix[i], 1e-5 );
-};
+    for ( int i = 0; i < countSize( matrix ); i++ )
+        OIIO_CHECK_EQUAL_THRESH( result[i], matrix[i], 1e-5 );
+}
 
 void testIDT_FindXYZtoCameraMtx()
 {
@@ -101,9 +101,9 @@ void testIDT_FindXYZtoCameraMtx()
 
     delete di;
 
-    FORI( countSize( matrix ) )
-    OIIO_CHECK_EQUAL_THRESH( result[i], matrix[i], 1e-5 );
-};
+    for ( int i = 0; i < countSize( matrix ); i++ )
+        OIIO_CHECK_EQUAL_THRESH( result[i], matrix[i], 1e-5 );
+}
 
 void testIDT_ColorTemperatureToXYZ()
 {
@@ -111,9 +111,9 @@ void testIDT_ColorTemperatureToXYZ()
     double              XYZ[3] = { 0.3135279229, 0.3235340821, 0.3629379950 };
     std::vector<double> result = rta::core::color_temperature_to_XYZ( cct );
 
-    FORI( countSize( XYZ ) )
-    OIIO_CHECK_EQUAL_THRESH( result[i], XYZ[i], 1e-5 );
-};
+    for ( int i = 0; i < countSize( XYZ ); i++ )
+        OIIO_CHECK_EQUAL_THRESH( result[i], XYZ[i], 1e-5 );
+}
 
 void testIDT_MatrixRGBtoXYZ()
 {
@@ -123,9 +123,9 @@ void testIDT_MatrixRGBtoXYZ()
     std::vector<double> result =
         rta::core::matrix_RGB_to_XYZ( rta::core::chromaticitiesACES );
 
-    FORI( countSize( XYZ ) )
-    OIIO_CHECK_EQUAL_THRESH( result[i], XYZ[i], 1e-5 );
-};
+    for ( int i = 0; i < countSize( XYZ ); i++ )
+        OIIO_CHECK_EQUAL_THRESH( result[i], XYZ[i], 1e-5 );
+}
 
 void testIDT_GetDNGCATMatrix()
 {
@@ -139,9 +139,10 @@ void testIDT_GetDNGCATMatrix()
 
     delete di;
 
-    FORIJ( 3, 3 )
-    OIIO_CHECK_EQUAL_THRESH( result[i][j], matrix[i][j], 1e-5 );
-};
+    for ( size_t i = 0; i < 3; i++ )
+        for ( size_t j = 0; j < 3; j++ )
+            OIIO_CHECK_EQUAL_THRESH( result[i][j], matrix[i][j], 1e-5 );
+}
 
 void testIDT_GetDNGIDTMatrix()
 {
@@ -155,9 +156,10 @@ void testIDT_GetDNGIDTMatrix()
 
     delete di;
 
-    FORIJ( 3, 3 )
-    OIIO_CHECK_EQUAL_THRESH( result[i][j], matrix[i][j], 1e-5 );
-};
+    for ( size_t i = 0; i < 3; i++ )
+        for ( size_t j = 0; j < 3; j++ )
+            OIIO_CHECK_EQUAL_THRESH( result[i][j], matrix[i][j], 1e-5 );
+}
 
 int main( int, char ** )
 {
