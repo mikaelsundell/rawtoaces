@@ -27,3 +27,26 @@ if (RTA_BUILD_PYTHON_BINDINGS)
         OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
     find_package ( nanobind CONFIG REQUIRED )
 endif ()
+
+# We require Qt6 with QRhi support (Qt 6.6+ recommended), but only
+# when building the optional GUI application. For now, attempt to locate it.
+set(RTA_MIN_QT_VERSION 6.6)
+set(RTA_QT_COMPONENTS Core Gui GuiPrivate Widgets)
+
+find_package(Qt6 COMPONENTS ${RTA_QT_COMPONENTS} QUIET)
+
+if (Qt6_FOUND)
+    message(STATUS "Qt6 found: ${Qt6_VERSION}")
+
+    if (Qt6_VERSION VERSION_LESS ${RTA_MIN_QT_VERSION})
+        message(WARNING "Qt6 version ${Qt6_VERSION} does not meet minimum "
+                        "QRhi requirement (${RTA_MIN_QT_VERSION}). "
+                        "QRhi features may not compile.")
+    else()
+        set(HAVE_QT6_QRHI TRUE)
+        message(STATUS "Qt6 is recent enough for QRhi support.")
+    endif()
+
+else()
+    message(STATUS "Qt6 not found. GUI components will be disabled.")
+endif()
