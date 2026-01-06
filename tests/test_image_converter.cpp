@@ -397,15 +397,6 @@ void test_collect_image_files_mixed_valid_invalid_paths()
     OIIO_CHECK_EQUAL( batches[1].size(), 1 );
 }
 
-/// Tests supported_raw_extensions() under normal OIIO runtime conditions
-void test_supported_raw_extensions()
-{
-    std::cout << std::endl << "test_supported_raw_extensions()" << std::endl;
-
-    const auto &exts = rta::util::supported_raw_extensions();
-    OIIO_CHECK_EQUAL( exts.empty(), false );
-}
-
 /// Tests parsing of RAW extensions from a mixed OIIO extension list
 void test_parse_raw_extensions()
 {
@@ -430,6 +421,15 @@ void test_parse_raw_extensions()
     // Should exclude non-RAW formats
     OIIO_CHECK_EQUAL( exts.count( ".jpg" ), 0 );
     OIIO_CHECK_EQUAL( exts.count( ".jpeg" ), 0 );
+}
+
+void test_parse_raw_extensions_empty()
+{
+    std::cout << std::endl << "test_parse_raw_extensions_empty()" << std::endl;
+    std::string                 extensionlist;
+    const std::set<std::string> exts =
+        rta::util::parse_raw_extensions( extensionlist );
+    OIIO_CHECK_EQUAL( exts.empty(), true );
 }
 
 /// Tests database_paths with no environment variables set (uses default paths)
@@ -699,6 +699,7 @@ void test_parse_parameters_list_formats()
     // Check for a few well-known RAW formats
     bool found_cr2 = false;
     bool found_dng = false;
+    bool found_png = false;
 
     for ( const auto &line: lines )
     {
@@ -706,10 +707,13 @@ void test_parse_parameters_list_formats()
             found_cr2 = true;
         if ( line == ".dng" )
             found_dng = true;
+        if ( line == ".png" )
+            found_png = true;
     }
 
     OIIO_CHECK_EQUAL( found_cr2, true );
     OIIO_CHECK_EQUAL( found_dng, true );
+    OIIO_CHECK_EQUAL( found_png, false );
 }
 
 /// This test verifies that when --list-cameras is provided, the method
@@ -1344,9 +1348,9 @@ void test_find_illuminant_camera_no_main_key()
     // Should fail because camera is not initialized (no "main" key)
     OIIO_CHECK_ASSERT( !success );
     OIIO_CHECK_ASSERT(
-        output.find(
-            "ERROR: camera needs to be initialised prior to calling "
-            "SpectralSolver::find_illuminant()" ) != std::string::npos );
+        output.find( "ERROR: camera needs to be initialised prior to calling "
+                     "SpectralSolver::find_illuminant()" ) !=
+        std::string::npos );
 }
 
 /// Tests that find_illuminant fails when camera data has "main" but with wrong size
@@ -1887,11 +1891,11 @@ void test_spectral_conversion_external_legacy_illuminant_success()
 
     // Create test directory with database
     TestFixture fixture;
-    auto       &test_dir = fixture.with_camera( "Blackmagic", "Cinema Camera" )
-                         .with_illuminant_custom(
-                             { { "schema_version", "0.1.0" },
-                               { "illuminant", "test_illuminant" } } )
-                         .build();
+    auto       &test_dir =
+        fixture.with_camera( "Blackmagic", "Cinema Camera" )
+            .with_illuminant_custom( { { "schema_version", "0.1.0" },
+                                       { "illuminant", "test_illuminant" } } )
+            .build();
 
     // Build command
     auto args = CommandBuilder()
@@ -2161,8 +2165,8 @@ int main( int, char ** )
         test_collect_image_files_mixed_valid_invalid_paths();
 
         // Tests for raw extensions
-        test_supported_raw_extensions();
         test_parse_raw_extensions();
+        test_parse_raw_extensions_empty();
 
         // Tests for database_paths
         test_database_paths_default();

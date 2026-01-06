@@ -59,20 +59,14 @@ parse_raw_extensions( const std::string &extensionlist )
 
     for ( const auto &group: groups )
     {
-        auto colon = group.find( ':' );
-        if ( colon == std::string::npos )
-            continue;
-
-        std::string format = group.substr( 0, colon );
-        if ( format != "raw" )
-            continue;
-
-        std::string              extlist = group.substr( colon + 1 );
-        std::vector<std::string> extvec;
-        OIIO::Strutil::split( extlist, extvec, "," );
-
-        for ( const auto &e: extvec )
-            result.insert( "." + OIIO::Strutil::lower( e ) );
+        if ( group.substr( 0, 4 ) == "raw:" )
+        {
+            std::string              ext_list = group.substr( 4 );
+            std::vector<std::string> ext_vec;
+            OIIO::Strutil::split( ext_list, ext_vec, "," );
+            for ( const auto &ext: ext_vec )
+                result.insert( "." + OIIO::Strutil::lower( ext ) );
+        }
     }
 
     return result;
@@ -94,9 +88,7 @@ const std::set<std::string> &supported_raw_extensions()
 {
     static const std::set<std::string> extensions = [] {
         std::string extensionlist;
-        if ( !OIIO::getattribute( "extension_list", extensionlist ) )
-            return std::set<std::string>{};
-
+        OIIO::getattribute( "extension_list", extensionlist );
         return parse_raw_extensions( extensionlist );
     }();
 
