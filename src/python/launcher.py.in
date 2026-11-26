@@ -1,0 +1,13 @@
+#!@Python_EXECUTABLE@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright Contributors to the rawtoaces project.
+
+from pathlib import Path
+import sys
+
+here = Path(__file__).resolve().parent
+sys.path.insert(0, str((here / r"@RTA_UI_MODULE_DIR@").resolve()))
+
+from rawtoaces_ui.application import main
+
+raise SystemExit(main())

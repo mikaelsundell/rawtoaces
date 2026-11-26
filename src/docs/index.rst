@@ -25,6 +25,7 @@ Shell, C++, and Python. The language references list signatures:
 
    getting_started
    user_guide
+   python_ui
    api/tasks/index
    lens_correction
    api/overview

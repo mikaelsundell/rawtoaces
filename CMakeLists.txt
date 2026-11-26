@@ -76,6 +76,7 @@ endforeach()
 
 option( ENABLE_SHARED "Enable Shared Libraries" ON )
 option( RTA_BUILD_PYTHON_BINDINGS "Build python bindings" ON )
+option( RTA_BUILD_PYTHON_UI "Build and install the PySide6 application" OFF )
 option( RTA_BUILD_TESTS "Build unit tests" ON )
 option( RTA_INSTALL_DATABASE "Download and install the spectral measurements database" ON )
 option( ENABLE_COVERAGE "Enable code coverage reporting" OFF )
@@ -84,6 +85,10 @@ option( RTA_ENABLE_EIGEN "Use Eigen for linear algebra" ON )
 option( RTA_ENABLE_CERES "Use Ceres Solver for matrix calculation" ON )
 set ( RTA_SANITISER_MODE "none" CACHE STRING "Dynamic analysis sanitiser mode ('none', 'address', 'memory', or 'thread')" )
 set ( RTA_PYTHON_VERSION ""  CACHE STRING "Python version to use" )
+
+if ( RTA_BUILD_PYTHON_UI AND NOT RTA_BUILD_PYTHON_BINDINGS )
+    message( FATAL_ERROR "RTA_BUILD_PYTHON_UI requires RTA_BUILD_PYTHON_BINDINGS=ON" )
+endif()
 
 if ( ENABLE_SHARED )
   set ( DO_SHARED SHARED )
@@ -103,6 +108,9 @@ endif()
 ##   Build
 
 add_definitions( -DPACKAGE="RAWTOACES" -DVERSION="${RAWTOACES_VERSION}" )
+if ( RTA_BUILD_TESTS )
+    enable_testing()
+endif()
 add_subdirectory("src/cpp/${RAWTOACES_CORE_LIB}")
 add_subdirectory("src/cpp/${RAWTOACES_UTIL_LIB}")
 add_subdirectory("src/cpp/rawtoaces")
@@ -111,8 +119,11 @@ if ( RTA_BUILD_PYTHON_BINDINGS )
     add_subdirectory(src/cpp/bindings)
 endif ( RTA_BUILD_PYTHON_BINDINGS )
 
+if ( RTA_BUILD_PYTHON_UI )
+    add_subdirectory(src/python)
+endif()
+
 if ( RTA_BUILD_TESTS )
-    enable_testing()
     add_subdirectory(tests)
 endif ( RTA_BUILD_TESTS )
 

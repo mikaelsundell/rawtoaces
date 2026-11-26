@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright Contributors to the rawtoaces project.
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rawtoaces-ui"
+version = "0.1.0"
+description = "Optional PySide6 application for the rawtoaces Python bindings"
+requires-python = ">=3.9"
+dependencies = ["PySide6>=6.5,<7", "OpenImageIO>=3.0", "opencolorio>=2.4,<3", "numpy>=1.23"]
+
+[project.gui-scripts]
+rawtoaces-ui = "rawtoaces_ui.application:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rawtoaces_ui*"]
+
+[tool.setuptools.package-data]
+rawtoaces_ui = ["resources/*.ui", "resources/*.qss"]

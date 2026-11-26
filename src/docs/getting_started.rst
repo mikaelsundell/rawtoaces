@@ -114,6 +114,9 @@ Build Options
    * - ``RTA_BUILD_PYTHON_BINDINGS``
      - ``ON``
      - Build the Python extension; requires Python development files and nanobind.
+   * - ``RTA_BUILD_PYTHON_UI``
+     - ``OFF``
+     - Build the optional :doc:`PySide6 desktop application <python_ui>`; requires the Python bindings, PySide6, NumPy, OpenColorIO, and OpenImageIO Python modules.
    * - ``RTA_BUILD_TESTS``
      - ``ON``
      - Build the C++ tests and register Python tests when bindings are enabled.

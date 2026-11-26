@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- Copyright Contributors to the rawtoaces project. -->
+<ui version="4.0">
+ <class>RawtoacesForm</class>
+ <widget class="QWidget" name="rawtoacesForm">
+  <layout class="QVBoxLayout" name="mainLayout" stretch="1,0">
+   <property name="spacing"><number>6</number></property>
+   <property name="leftMargin"><number>6</number></property>
+   <property name="topMargin"><number>6</number></property>
+   <property name="rightMargin"><number>6</number></property>
+   <property name="bottomMargin"><number>6</number></property>
+   <item>
+    <widget class="QSplitter" name="mainSplitter">
+     <property name="orientation"><enum>Qt::Horizontal</enum></property>
+     <property name="childrenCollapsible"><bool>false</bool></property>
+     <widget class="QSplitter" name="contentSplitter">
+      <property name="orientation"><enum>Qt::Vertical</enum></property>
+      <property name="childrenCollapsible"><bool>false</bool></property>
+      <widget class="QFrame" name="viewerBlock">
+       <property name="PanelBlock" stdset="0"><bool>true</bool></property>
+       <layout class="QVBoxLayout" name="viewerLayout">
+        <property name="leftMargin"><number>8</number></property>
+        <property name="topMargin"><number>8</number></property>
+        <property name="rightMargin"><number>8</number></property>
+        <property name="bottomMargin"><number>8</number></property>
+        <item><widget class="QLabel" name="viewerTitle"><property name="text"><string>Image view</string></property><property name="BlockTitle" stdset="0"><bool>true</bool></property></widget></item>
+        <item><widget class="QWidget" name="viewerHost"><layout class="QVBoxLayout" name="viewerHostLayout"><property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property></layout></widget></item>
+       </layout>
+      </widget>
+      <widget class="QFrame" name="queueBlock">
+       <property name="PanelBlock" stdset="0"><bool>true</bool></property>
+       <layout class="QVBoxLayout" name="queueBlockLayout">
+        <property name="leftMargin"><number>8</number></property><property name="topMargin"><number>8</number></property><property name="rightMargin"><number>8</number></property><property name="bottomMargin"><number>8</number></property>
+        <item><widget class="QLabel" name="queueTitle"><property name="text"><string>Conversion queue</string></property><property name="BlockTitle" stdset="0"><bool>true</bool></property></widget></item>
+        <item><widget class="QWidget" name="fileButtons"><layout class="QHBoxLayout" name="fileButtonLayout">
+         <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
+         <item><widget class="QPushButton" name="addFilesButton"><property name="text"><string>Add files…</string></property><property name="toolTip"><string>Add supported RAW image files to the queue.</string></property></widget></item>
+         <item><widget class="QPushButton" name="addFolderButton"><property name="text"><string>Add folder…</string></property><property name="toolTip"><string>Add RAW files from a folder.</string></property></widget></item>
+         <item><widget class="QPushButton" name="removeButton"><property name="text"><string>Remove</string></property><property name="toolTip"><string>Remove selected queue entries.</string></property></widget></item>
+         <item><widget class="QPushButton" name="clearButton"><property name="text"><string>Clear</string></property><property name="toolTip"><string>Clear the queue.</string></property></widget></item>
+         <item><spacer name="fileButtonSpacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint"><size><width>40</width><height>20</height></size></property></spacer></item>
+        </layout></widget></item>
+        <item><widget class="QWidget" name="queueHost"><layout class="QVBoxLayout" name="queueHostLayout"><property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property></layout></widget></item>
+        <item><widget class="QLabel" name="selectionInfo"><property name="text"><string>Drop RAW files or folders into the queue. Drop an EXR to view it.</string></property><property name="wordWrap"><bool>true</bool></property></widget></item>
+       </layout>
+      </widget>
+      <widget class="QFrame" name="logBlock">
+       <property name="PanelBlock" stdset="0"><bool>true</bool></property>
+       <layout class="QVBoxLayout" name="logLayout">
+        <property name="leftMargin"><number>8</number></property><property name="topMargin"><number>8</number></property><property name="rightMargin"><number>8</number></property><property name="bottomMargin"><number>8</number></property>
+        <item><widget class="QLabel" name="logTitle"><property name="text"><string>Log</string></property><property name="BlockTitle" stdset="0"><bool>true</bool></property></widget></item>
+        <item><widget class="QPlainTextEdit" name="conversionLog"><property name="readOnly"><bool>true</bool></property><property name="maximumBlockCount"><number>3000</number></property><property name="placeholderText"><string>Conversion messages appear here.</string></property></widget></item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QFrame" name="propertiesBlock">
+      <property name="PanelBlock" stdset="0"><bool>true</bool></property>
+      <property name="minimumSize"><size><width>350</width><height>0</height></size></property>
+      <layout class="QVBoxLayout" name="propertiesLayout">
+       <property name="leftMargin"><number>8</number></property><property name="topMargin"><number>8</number></property><property name="rightMargin"><number>8</number></property><property name="bottomMargin"><number>8</number></property>
+       <item><widget class="QLabel" name="propertiesTitle"><property name="text"><string>Conversion settings</string></property><property name="BlockTitle" stdset="0"><bool>true</bool></property></widget></item>
+       <item><widget class="QPushButton" name="dataButton"><property name="text"><string>Choose spectral data folder…</string></property><property name="toolTip"><string>Explicitly select the data directory inside rawtoaces-data.</string></property></widget></item>
+       <item><widget class="QWidget" name="propertiesHost"><layout class="QVBoxLayout" name="propertiesHostLayout"><property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property><property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property></layout></widget></item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item><widget class="QFrame" name="actionBlock">
+    <property name="PanelBlock" stdset="0"><bool>true</bool></property>
+    <property name="sizePolicy"><sizepolicy hsizetype="Expanding" vsizetype="Fixed"><horstretch>0</horstretch><verstretch>0</verstretch></sizepolicy></property>
+    <layout class="QHBoxLayout" name="actionLayout">
+     <item><widget class="QProgressBar" name="conversionProgress"><property name="value"><number>0</number></property><property name="maximum"><number>1</number></property><property name="textVisible"><bool>false</bool></property></widget></item>
+     <item><widget class="QLabel" name="statusLabel"><property name="text"><string>Ready</string></property></widget></item>
+     <item><widget class="QPushButton" name="stopButton"><property name="text"><string>Stop after current image</string></property><property name="enabled"><bool>false</bool></property><property name="toolTip"><string>Finish the active image, then stop the remaining queue.</string></property></widget></item>
+     <item><widget class="QPushButton" name="convertButton"><property name="text"><string>Convert images</string></property><property name="default"><bool>true</bool></property><property name="toolTip"><string>Convert the queue using the current conversion settings.</string></property></widget></item>
+    </layout>
+   </widget></item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
